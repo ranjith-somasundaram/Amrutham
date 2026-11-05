@@ -185,19 +185,6 @@ h2.sec{font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1
 .pl .tot.v{color:var(--good)}
 
 /* Coupons */
-.dots{display:grid;grid-template-columns:repeat(15,minmax(0,1fr));gap:6px}
-@media (min-width:760px){.dots{grid-template-columns:repeat(30,minmax(0,1fr));gap:7px}}
-.dot{all:unset;box-sizing:border-box;aspect-ratio:1;border-radius:50%;cursor:pointer;transition:transform .15s}
-.dot:hover{transform:scale(1.25)}
-.dot:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
-.dot.d-received{background:var(--good)}
-.dot.d-partial{background:var(--gold)}
-.dot.d-pending{background:var(--warn);opacity:.85}
-.dot.d-notgiven{box-shadow:inset 0 0 0 1.5px var(--idle)}
-.dot.d-missing{background:var(--panel);box-shadow:inset 0 0 0 2px var(--bad)}
-.dot.sel{outline:2px solid var(--ink);outline-offset:2px}
-.dot-info{margin-top:14px;min-height:22px;font-size:13.5px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.leg .n i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px;vertical-align:4px}
 .stack{display:flex;height:18px;border-radius:999px;overflow:hidden;gap:2px;background:var(--panel-2)}
 .stack i{display:block;height:100%}
 .leg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
@@ -279,10 +266,8 @@ footer{margin-top:28px;font-size:12px;color:var(--muted);text-align:center}
 @media (prefers-reduced-motion:no-preference){
   .intro .view>*{animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
   .intro .view>*:nth-child(2){animation-delay:.05s}.intro .view>*:nth-child(3){animation-delay:.1s}.intro .view>*:nth-child(4){animation-delay:.15s}.intro .view>*:nth-child(5){animation-delay:.2s}
-  .intro .mini i,.intro .bar i,.intro .share i,.intro .cd-bar i{animation:grow .9s cubic-bezier(.2,.7,.2,1) both;transform-origin:left}
-  .intro .dot{animation:pop .4s cubic-bezier(.2,.7,.2,1) both}
+  .intro .mini i,.intro .bar i,.intro .stack,.intro .share i,.intro .cd-bar i{animation:grow .9s cubic-bezier(.2,.7,.2,1) both;transform-origin:left}
   @keyframes grow{from{transform:scaleX(0)}to{transform:none}}
-  @keyframes pop{from{transform:scale(.4)}to{transform:none}}
   @keyframes rise{from{transform:translateY(8px)}to{transform:none}}
   .ring circle.val{transition:stroke-dashoffset .9s cubic-bezier(.2,.7,.2,1)}
 }
@@ -482,21 +467,14 @@ function vOverview(){
 }
 
 let cpFilter = 'pending', cpQuery = '', openMember = null;
-function dotInfo(){
-  const c = DATA.coupons.find(x=>String(x.no)===cpQuery.trim());
-  if(!c) return '<span class="muted">Tap a dot to see that book.</span>';
-  const st=STATUS[c.status]||{label:c.status||'—',cls:''};
-  return `<b>Book #${esc(c.no)}</b> · ${esc(c.name||'Not handed out')} <span class="pill ${st.cls}">${esc(st.label)}</span>${c.recv?` <span class="muted">· AED ${fmt(c.recv)}${c.date?' on '+dShort(c.date):''}</span>`:''}`;
-}
 function vCoupons(){
   const order = ['Received','Partially Received','Not Received','Missing','Not Given'];
   const bar = order.filter(k=>M.counts[k]).map(k=>`<i style="width:${(pct(M.counts[k],M.totalBooks)*100).toFixed(2)}%;background:${STATUS[k].color}" title="${STATUS[k].label}: ${M.counts[k]}"></i>`).join('');
-  const leg = order.filter(k=>k!=='Partially Received'||M.counts[k]).map(k=>`<div><div class="n num"><i class="dot d-${STATUS[k].cls.slice(2)}" style="cursor:default;transform:none;width:10px;height:10px;display:inline-block;vertical-align:4px;margin-right:7px"></i>${M.counts[k]}</div><div class="l">${STATUS[k].label}</div></div>`).join('');
+  const leg = order.filter(k=>k!=='Partially Received'||M.counts[k]).map(k=>`<div><div class="n num" style="color:${STATUS[k].color}">${M.counts[k]}</div><div class="l">${STATUS[k].label}</div></div>`).join('');
   return `
   <div class="sec-head"><h2 class="sec">Coupon books</h2><span class="meta num">${M.totalBooks} books · AED ${fmt(M.price)} each</span></div>
   <div class="card">
-    <div class="dots" role="group" aria-label="All ${M.totalBooks} coupon books by status">${[...DATA.coupons].sort((a,b)=>a.no-b.no).map(c=>{const st=STATUS[c.status]||STATUS['Not Given'];return `<button type="button" style="animation-delay:${(Math.min(c.no,120)*6)}ms" class="dot d-${(st.cls||'').slice(2)}${String(c.no)===cpQuery.trim()?' sel':''}" data-book="${esc(c.no)}" aria-label="Book ${esc(c.no)}: ${esc(st.label)}${c.name?', '+esc(c.name):''}"></button>`;}).join('')}</div>
-    <div class="dot-info" id="dot-info">${dotInfo()}</div>
+    <div class="stack" role="img" aria-label="${order.map(k=>STATUS[k].label+' '+M.counts[k]).join(', ')}">${bar}</div>
     <div class="leg">${leg}</div>
   </div>
   <div class="stats3">
@@ -635,18 +613,12 @@ function countUp(){
 window.addEventListener('hashchange',()=>{ introNext=true; render(false); });
 app.addEventListener('click',e=>{
   if(e.target.id==='retry'){ loadState='loading'; render(true); load(); return; }
-  const dot = e.target.closest('[data-book]');
-  if(dot){ const no=dot.dataset.book; cpQuery = cpQuery.trim()===no ? '' : no; cpFilter='all'; openMember=null;
-    const inp=document.getElementById('cp-search'); if(inp) inp.value=cpQuery;
-    document.querySelectorAll('.dot.sel').forEach(d=>d.classList.remove('sel')); if(cpQuery) dot.classList.add('sel');
-    document.getElementById('dot-info').innerHTML=dotInfo(); document.getElementById('cp-list').innerHTML=memberList();
-    document.querySelectorAll('[data-f]').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.f==='all'))); return; }
   const f = e.target.closest('[data-f]'); if(f){ cpFilter=f.dataset.f; openMember=null; render(true); return; }
   const m = e.target.closest('[data-m]'); if(m){ openMember = openMember===m.dataset.m?null:m.dataset.m; document.getElementById('cp-list').innerHTML = memberList(); return; }
   const l = e.target.closest('[data-l]'); if(l){ openLine = openLine===l.dataset.l?null:l.dataset.l; render(true); return; }
 });
 app.addEventListener('input',e=>{
-  if(e.target.id==='cp-search'){ cpQuery=e.target.value; openMember=null; document.getElementById('cp-list').innerHTML = memberList(); const di=document.getElementById('dot-info'); if(di){ di.innerHTML=dotInfo(); document.querySelectorAll('.dot').forEach(d=>d.classList.toggle('sel', d.dataset.book===cpQuery.trim())); } }
+  if(e.target.id==='cp-search'){ cpQuery=e.target.value; openMember=null; document.getElementById('cp-list').innerHTML = memberList(); }
 });
 const topEl = document.getElementById('top');
 window.addEventListener('scroll',()=>topEl.classList.toggle('scrolled',window.scrollY>4),{passive:true});
