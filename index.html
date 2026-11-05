@@ -97,14 +97,15 @@ h2.sec{font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1
 @media (min-width:900px){.grid2{grid-template-columns:1.15fr 1fr;align-items:start}}
 
 /* Hero */
-.hero{position:relative;border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow);background:#1b1442;aspect-ratio:16/10;max-width:100%}
-.hero img{width:100%;height:100%;object-fit:cover;object-position:50% 18%;display:block}
-.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,10,40,0) 45%,rgba(15,10,40,.82) 100%)}
+.hero{position:relative;border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow);background:#1b1442;aspect-ratio:1070/424;max-width:100%}
+.hero img{width:100%;height:100%;object-fit:cover;display:block}
+.pair{display:grid;gap:16px;grid-template-columns:1fr}
+@media (min-width:760px){.pair{grid-template-columns:1fr 1fr;align-items:stretch}}
 .hero .cap{position:absolute;left:16px;right:16px;bottom:14px;z-index:1;color:#fff;display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
 .hero .cap .t{font-family:var(--f-display);font-weight:700;font-size:20px;line-height:1.1}
 .hero .cap .s{font-size:13px;font-weight:700;letter-spacing:.02em}
 .chip-gold{background:#F2B33D;color:#2A1A00;font-weight:800;font-size:11.5px;padding:5px 10px;border-radius:999px;white-space:nowrap;letter-spacing:.04em}
-@media (min-width:900px){.hero{aspect-ratio:auto;height:100%;min-height:340px}}
+
 
 /* Cash card */
 .cash .big{font-size:56px}
@@ -276,7 +277,7 @@ const CONFIG = {
   DATA_URL: "https://script.google.com/macros/s/AKfycbwyj3kD7d8rHvvoaVhoJZvMzO3EOrVD-M_HGfCKC2Ztp7yx084E5bjoB9PMJifdyeos/exec",
   REFRESH_SECONDS: 60
 };
-const POSTER = "poster.jpg";
+const POSTER = "banner.jpg";
 let DATA = null, M = null, lastLoaded = null, lastJson = "", loadState = "loading", loadError = "";
 
 /* ---------- helpers ---------- */
@@ -362,11 +363,8 @@ function vOverview(){
   if(M.toRaise) alerts.push({c:'var(--gold)',t:`<b>AED ${fmt(M.toRaise)}</b> still to raise to cover the budget`,s:`Receipts so far cover ${pctTxt(pct(M.receipts,M.budget))} of AED ${fmt(M.budget)}`,go:'#budget'});
   const paidBooks = M.counts['Received']+M.counts['Partially Received'];
   return `
-  <section class="grid2">
-    <div class="hero"><img src="${POSTER}" alt="Nattarangu event poster: an Amrutham Family dance and musical extravaganza presented by Chandran Gurukkal Ayurvedic Clinic, powered by Bhima">
-      <div class="cap"><span class="s">Dance &amp; Musical Extravaganza</span><span class="chip-gold">41 YEARS</span></div>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+  <div class="hero"><img src="${POSTER}" alt="Nattarangu: an Amrutham Family dance and musical extravaganza, celebrating the 41st anniversary, powered by Bhima"></div>
+  <section class="pair">
       <div class="card cash">
         <div class="eyebrow">Cash in hand</div>
         <div class="big num" style="margin-top:6px"><span class="aed">AED</span>${fmt(M.cash)}</div>
@@ -386,7 +384,6 @@ function vOverview(){
           </dl>
         </div>
       </div>
-    </div>
   </section>
 
   <div class="sec-head"><h2 class="sec">At a glance</h2><span class="meta">Tap to see details</span></div>
