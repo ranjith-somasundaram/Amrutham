@@ -20,7 +20,8 @@ img{max-width:100%}
   --indigo:#3A2B93; --indigo-soft:#ECE9FB; --gold:#C98A12; --gold-ink:#8A5C00; --gold-soft:#FFF4DA;
   --good:#1F8A5B; --good-soft:#E3F5EC; --warn:#D2761A; --warn-soft:#FDEEDD; --bad:#C2384E; --bad-soft:#FBE5E9;
   --idle:#A9A6C0; --idle-soft:#EEEDF4;
-  --shadow:0 1px 2px rgba(28,23,69,.05),0 8px 24px -12px rgba(28,23,69,.14);
+  --shadow:0 1px 2px rgba(28,23,69,.04);
+  --shadow-hover:0 1px 2px rgba(28,23,69,.04),0 10px 28px -14px rgba(28,23,69,.22);
   --f-display:"Baloo Chettan 2","Manjari",system-ui,sans-serif;
   --f-body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
   --r-lg:22px; --r-md:16px; --r-sm:10px;
@@ -85,7 +86,7 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(-
 
 /* Generic */
 .view{display:flex;flex-direction:column;gap:16px;padding-top:8px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);padding:18px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;min-width:0}
 .eyebrow{font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 h2.sec{font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1.1;margin:0;text-wrap:balance}
 .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:8px}
@@ -100,13 +101,23 @@ h2.sec{font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1
 .hero{position:relative;border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow);background:#1b1442;aspect-ratio:1070/424;max-width:100%}
 .hero img{width:100%;height:100%;object-fit:cover;display:block}
 .top-grid{display:grid;gap:16px;grid-template-columns:1fr}
+.hero-col{display:flex;flex-direction:column;gap:12px;min-width:0}
+.countdown{display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:14px;row-gap:10px;padding:12px 16px;border-radius:var(--r-md);background:linear-gradient(110deg,var(--gold-soft),var(--panel) 70%);border:1px solid color-mix(in srgb,var(--gold) 30%,var(--line))}
+.countdown .cd-n{font-family:var(--f-display);font-weight:700;font-size:40px;line-height:.9;color:var(--gold-ink);min-width:1.2ch}
+.countdown .cd-t{display:flex;flex-direction:column;min-width:0}
+.countdown .cd-t b{font-size:14px;font-weight:800;letter-spacing:.02em}
+.countdown .cd-t span{font-size:12.5px;color:var(--muted)}
+.countdown .cd-bar{grid-column:1/-1;height:4px;border-radius:999px;background:color-mix(in srgb,var(--gold) 18%,transparent);overflow:hidden}
+.countdown .cd-bar i{display:block;height:100%;background:var(--gold);border-radius:999px}
+.countdown.today .cd-n{font-size:28px}
 .kpi-stack{display:flex;flex-direction:column;gap:14px;min-width:0}
 @media (min-width:1000px){.top-grid{grid-template-columns:1.05fr 1fr;align-items:center}}
 .kpis{display:flex;flex-direction:column;gap:8px}
 .kpi-h{font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .kpi-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--shadow);padding:12px 12px 11px;min-width:0}
-.kpi .v{font-family:var(--f-display);font-weight:800;font-size:clamp(19px,5.6vw,34px);line-height:1;letter-spacing:-.3px;white-space:nowrap}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-md);padding:13px 12px 12px;min-width:0}
+.kpi.act{border-color:color-mix(in srgb,var(--gold) 35%,var(--line))}
+.kpi .v{font-family:var(--f-display);font-weight:700;font-size:clamp(19px,5.6vw,34px);line-height:1;letter-spacing:-.3px;white-space:nowrap}
 .kpi .l{font-size:12.5px;font-weight:800;margin-top:6px;line-height:1.2}
 .kpi .s{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.25}
 @media (min-width:760px){.kpi{padding:16px 18px}.kpi .l{font-size:14px}.kpi .s{font-size:12px}}
@@ -145,13 +156,14 @@ h2.sec{font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1
 /* Tiles */
 .tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 @media (min-width:900px){.tiles{grid-template-columns:repeat(4,minmax(0,1fr))}}
-.tile{display:flex;flex-direction:column;gap:6px;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:var(--r-md);padding:14px;box-shadow:var(--shadow);cursor:pointer;text-decoration:none;color:var(--ink);transition:transform .15s,border-color .15s;min-width:0}
-.tile:hover{border-color:var(--indigo);transform:translateY(-1px)}
+.tile{display:flex;flex-direction:column;gap:6px;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:var(--r-md);padding:14px;cursor:pointer;text-decoration:none;color:var(--ink);transition:transform .2s,box-shadow .2s,border-color .2s;min-width:0}
+.tile:hover{border-color:color-mix(in srgb,var(--indigo) 30%,var(--line));box-shadow:var(--shadow-hover);transform:translateY(-1px)}
 .tile .top-row{display:flex;justify-content:space-between;align-items:center}
 .tile .ico{width:34px;height:34px;border-radius:11px;display:grid;place-items:center}
 .tile .ico svg{width:19px;height:19px}
 .tile .arrow{color:var(--muted)}
-.tile .v{font-family:var(--f-display);font-weight:800;font-size:27px;line-height:1}
+.tile .v{font-family:var(--f-display);font-weight:700;font-size:27px;line-height:1}
+.tile .ico{background:var(--panel-2);color:var(--muted)}
 .tile .l{font-size:13px;font-weight:700}
 .tile .s{font-size:12px;color:var(--muted)}
 .mini{height:5px;border-radius:999px;background:var(--panel-2);overflow:hidden;margin-top:2px}
@@ -173,17 +185,30 @@ h2.sec{font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1
 .pl .tot.v{color:var(--good)}
 
 /* Coupons */
+.dots{display:grid;grid-template-columns:repeat(15,minmax(0,1fr));gap:6px}
+@media (min-width:760px){.dots{grid-template-columns:repeat(30,minmax(0,1fr));gap:7px}}
+.dot{all:unset;box-sizing:border-box;aspect-ratio:1;border-radius:50%;cursor:pointer;transition:transform .15s}
+.dot:hover{transform:scale(1.25)}
+.dot:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
+.dot.d-received{background:var(--good)}
+.dot.d-partial{background:var(--gold)}
+.dot.d-pending{background:var(--warn);opacity:.85}
+.dot.d-notgiven{box-shadow:inset 0 0 0 1.5px var(--idle)}
+.dot.d-missing{background:var(--panel);box-shadow:inset 0 0 0 2px var(--bad)}
+.dot.sel{outline:2px solid var(--ink);outline-offset:2px}
+.dot-info{margin-top:14px;min-height:22px;font-size:13.5px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.leg .n i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px;vertical-align:4px}
 .stack{display:flex;height:18px;border-radius:999px;overflow:hidden;gap:2px;background:var(--panel-2)}
 .stack i{display:block;height:100%}
 .leg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
 @media (min-width:600px){.leg{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .leg div{padding:10px 12px;border-radius:12px;background:var(--panel-2)}
-.leg .n{font-family:var(--f-display);font-weight:800;font-size:24px;line-height:1}
+.leg .n{font-family:var(--f-display);font-weight:700;font-size:24px;line-height:1}
 .leg .l{font-size:12px;font-weight:700;color:var(--muted)}
 .stats3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .stat{padding:12px;border-radius:var(--r-md);background:var(--panel);border:1px solid var(--line);min-width:0}
 .stat .l{font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.stat .v{font-family:var(--f-display);font-weight:800;font-size:22px;line-height:1.1;margin-top:2px}
+.stat .v{font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1.1;margin-top:2px}
 
 .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .seg{display:inline-flex;background:var(--panel-2);padding:4px;border-radius:999px;gap:2px}
@@ -252,8 +277,12 @@ h2.sec{font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1
 footer{margin-top:28px;font-size:12px;color:var(--muted);text-align:center}
 
 @media (prefers-reduced-motion:no-preference){
-  .view>*{animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
-  .view>*:nth-child(2){animation-delay:.04s}.view>*:nth-child(3){animation-delay:.08s}.view>*:nth-child(4){animation-delay:.12s}.view>*:nth-child(5){animation-delay:.16s}
+  .intro .view>*{animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
+  .intro .view>*:nth-child(2){animation-delay:.05s}.intro .view>*:nth-child(3){animation-delay:.1s}.intro .view>*:nth-child(4){animation-delay:.15s}.intro .view>*:nth-child(5){animation-delay:.2s}
+  .intro .mini i,.intro .bar i,.intro .share i,.intro .cd-bar i{animation:grow .9s cubic-bezier(.2,.7,.2,1) both;transform-origin:left}
+  .intro .dot{animation:pop .4s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes grow{from{transform:scaleX(0)}to{transform:none}}
+  @keyframes pop{from{transform:scale(.4)}to{transform:none}}
   @keyframes rise{from{transform:translateY(8px)}to{transform:none}}
   .ring circle.val{transition:stroke-dashoffset .9s cubic-bezier(.2,.7,.2,1)}
 }
@@ -289,6 +318,7 @@ const CONFIG = {
   REFRESH_SECONDS: 60
 };
 const POSTER = "banner.jpg";
+const EVENT_DATE = "2026-11-21";   // event day (Saturday 21 November 2026)
 let DATA = null, M = null, lastLoaded = null, lastJson = "", loadState = "loading", loadError = "";
 
 /* ---------- helpers ---------- */
@@ -357,6 +387,18 @@ function model(){
 
 
 /* ---------- views ---------- */
+function countdown(){
+  const now=new Date(), today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const [y,m,d]=EVENT_DATE.split('-').map(Number), ev=new Date(y,m-1,d);
+  const days=Math.round((ev-today)/86400000);
+  const when=ev.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+  const big = days>0 ? days : (days===0 ? 'Today' : '');
+  const lbl = days>1 ? 'days to go' : days===1 ? 'day to go' : days===0 ? 'Showtime' : 'Event held';
+  return `<div class="countdown${days===0?' today':''}" role="timer" aria-label="${days>0?days+' '+lbl:lbl}, ${when}">
+    <div class="cd-n num">${big}</div>
+    <div class="cd-t"><b>${lbl}</b><span>${when}</span></div>
+  </div>`;
+}
 function vOverview(){
   const inShare = pct(M.collections, M.collections+M.paid);
   const fund = Math.min(1,pct(M.receipts,M.budget)), spent = Math.min(1,pct(M.cost,M.budget));
@@ -375,22 +417,25 @@ function vOverview(){
   const paidBooks = M.counts['Received']+M.counts['Partially Received'];
   return `
   <div class="top-grid">
+  <div class="hero-col">
   <div class="hero"><img src="${POSTER}" alt="Nattarangu: an Amrutham Family dance and musical extravaganza, celebrating the 41st anniversary, powered by Bhima"></div>
+  ${countdown()}
+  </div>
   <div class="kpi-stack">
   <section class="kpis" aria-label="Target">
     <div class="kpi-h">Target</div>
     <div class="kpi-row">
       <div class="kpi"><div class="v num">${fmt(M.budget)}</div><div class="l">Budget</div><div class="s">approved</div></div>
-      <div class="kpi"><div class="v num" style="color:var(--gold-ink)">${fmt(M.toRaise)}</div><div class="l">Still to raise</div><div class="s">${pctTxt(pct(M.toRaise,M.budget))} of budget</div></div>
-      <div class="kpi"><div class="v num" style="color:var(--warn)">${fmt(M.spPending)}</div><div class="l">Still to collect</div><div class="s">promised</div></div>
+      <div class="kpi act"><div class="v num" style="color:var(--gold-ink)">${fmt(M.toRaise)}</div><div class="l">Still to raise</div><div class="s">${pctTxt(pct(M.toRaise,M.budget))} of budget</div></div>
+      <div class="kpi${M.spPending?' act':''}"><div class="v num" style="color:${M.spPending?'var(--warn)':'var(--ink)'}">${fmt(M.spPending)}</div><div class="l">Still to collect</div><div class="s">promised</div></div>
     </div>
   </section>
   <section class="kpis" aria-label="Money">
     <div class="kpi-h">Money</div>
     <div class="kpi-row">
-      <div class="kpi"><div class="v num" style="color:var(--indigo)">${fmt(M.collections)}</div><div class="l">Collected</div><div class="s">sponsors + coupons</div></div>
-      <div class="kpi"><div class="v num" style="color:var(--bad)">${fmt(M.paid)}</div><div class="l">Paid out</div><div class="s">${pctTxt(pct(M.paid,M.budget))} of budget</div></div>
-      <div class="kpi"><div class="v num" style="color:var(--good)">${fmt(M.cash)}</div><div class="l">Cash in hand</div><div class="s">collected − paid</div></div>
+      <div class="kpi"><div class="v num">${fmt(M.collections)}</div><div class="l">Collected</div><div class="s">sponsors + coupons</div></div>
+      <div class="kpi"><div class="v num">${fmt(M.paid)}</div><div class="l">Paid out</div><div class="s">${pctTxt(pct(M.paid,M.budget))} of budget</div></div>
+      <div class="kpi"><div class="v num">${fmt(M.cash)}</div><div class="l">Cash in hand</div><div class="s">collected − paid</div></div>
     </div>
   </section>
   </div></div>
@@ -398,22 +443,22 @@ function vOverview(){
   <div class="sec-head"><h2 class="sec">At a glance</h2><span class="meta">Tap to see details</span></div>
   <section class="tiles">
     <a class="tile" href="#sponsors">
-      <div class="top-row"><span class="ico" style="background:var(--gold-soft);color:var(--gold-ink)">${SVG.star}</span><span class="arrow">${SVG.arrow}</span></div>
+      <div class="top-row"><span class="ico">${SVG.star}</span><span class="arrow">${SVG.arrow}</span></div>
       <div class="v num">${fmt(M.spCollected)}</div><div class="l">Sponsorship</div><div class="s">${DATA.sponsors.length} sponsors · collected</div>
     </a>
     <a class="tile" href="#coupons">
-      <div class="top-row"><span class="ico" style="background:var(--good-soft);color:var(--good)">${SVG.ticket}</span><span class="arrow">${SVG.arrow}</span></div>
+      <div class="top-row"><span class="ico">${SVG.ticket}</span><span class="arrow">${SVG.arrow}</span></div>
       <div class="v num">${fmt(M.cpCollected)}</div><div class="l">Coupon money in</div><div class="s">${paidBooks} of ${M.totalBooks} books paid</div>
-      <div class="mini"><i style="width:${(pct(paidBooks,M.totalBooks)*100).toFixed(1)}%;background:var(--good)"></i></div>
+      <div class="mini"><i style="width:${(pct(paidBooks,M.totalBooks)*100).toFixed(1)}%;background:var(--indigo)"></i></div>
     </a>
     <a class="tile" href="#coupons">
-      <div class="top-row"><span class="ico" style="background:var(--warn-soft);color:var(--warn)">${SVG.clock}</span><span class="arrow">${SVG.arrow}</span></div>
+      <div class="top-row"><span class="ico">${SVG.clock}</span><span class="arrow">${SVG.arrow}</span></div>
       <div class="v num">${fmt(M.pendingValue)}</div><div class="l">Coupon money pending</div><div class="s">${M.pendingBooks} books with members</div>
     </a>
     <a class="tile" href="#budget">
-      <div class="top-row"><span class="ico" style="background:var(--bad-soft);color:var(--bad)">${SVG.wallet}</span><span class="arrow">${SVG.arrow}</span></div>
+      <div class="top-row"><span class="ico">${SVG.wallet}</span><span class="arrow">${SVG.arrow}</span></div>
       <div class="v num">${fmt(M.cost)}</div><div class="l">Expenses</div><div class="s">${pctTxt(pct(M.cost,M.budget))} of AED ${fmt(M.budget)} budget</div>
-      <div class="mini"><i style="width:${(spent*100).toFixed(1)}%;background:var(--bad)"></i></div>
+      <div class="mini"><i style="width:${(spent*100).toFixed(1)}%;background:var(--indigo)"></i></div>
     </a>
   </section>
 
@@ -437,18 +482,25 @@ function vOverview(){
 }
 
 let cpFilter = 'pending', cpQuery = '', openMember = null;
+function dotInfo(){
+  const c = DATA.coupons.find(x=>String(x.no)===cpQuery.trim());
+  if(!c) return '<span class="muted">Tap a dot to see that book.</span>';
+  const st=STATUS[c.status]||{label:c.status||'—',cls:''};
+  return `<b>Book #${esc(c.no)}</b> · ${esc(c.name||'Not handed out')} <span class="pill ${st.cls}">${esc(st.label)}</span>${c.recv?` <span class="muted">· AED ${fmt(c.recv)}${c.date?' on '+dShort(c.date):''}</span>`:''}`;
+}
 function vCoupons(){
   const order = ['Received','Partially Received','Not Received','Missing','Not Given'];
   const bar = order.filter(k=>M.counts[k]).map(k=>`<i style="width:${(pct(M.counts[k],M.totalBooks)*100).toFixed(2)}%;background:${STATUS[k].color}" title="${STATUS[k].label}: ${M.counts[k]}"></i>`).join('');
-  const leg = order.filter(k=>k!=='Partially Received'||M.counts[k]).map(k=>`<div><div class="n num" style="color:${STATUS[k].color}">${M.counts[k]}</div><div class="l">${STATUS[k].label}</div></div>`).join('');
+  const leg = order.filter(k=>k!=='Partially Received'||M.counts[k]).map(k=>`<div><div class="n num"><i class="dot d-${STATUS[k].cls.slice(2)}" style="cursor:default;transform:none;width:10px;height:10px;display:inline-block;vertical-align:4px;margin-right:7px"></i>${M.counts[k]}</div><div class="l">${STATUS[k].label}</div></div>`).join('');
   return `
   <div class="sec-head"><h2 class="sec">Coupon books</h2><span class="meta num">${M.totalBooks} books · AED ${fmt(M.price)} each</span></div>
   <div class="card">
-    <div class="stack" role="img" aria-label="${order.map(k=>STATUS[k].label+' '+M.counts[k]).join(', ')}">${bar}</div>
+    <div class="dots" role="group" aria-label="All ${M.totalBooks} coupon books by status">${[...DATA.coupons].sort((a,b)=>a.no-b.no).map(c=>{const st=STATUS[c.status]||STATUS['Not Given'];return `<button type="button" style="animation-delay:${(Math.min(c.no,120)*6)}ms" class="dot d-${(st.cls||'').slice(2)}${String(c.no)===cpQuery.trim()?' sel':''}" data-book="${esc(c.no)}" aria-label="Book ${esc(c.no)}: ${esc(st.label)}${c.name?', '+esc(c.name):''}"></button>`;}).join('')}</div>
+    <div class="dot-info" id="dot-info">${dotInfo()}</div>
     <div class="leg">${leg}</div>
   </div>
   <div class="stats3">
-    <div class="stat"><div class="l">Collected</div><div class="v num" style="color:var(--good)">${fmt(M.cpCollected)}</div></div>
+    <div class="stat"><div class="l">Collected</div><div class="v num">${fmt(M.cpCollected)}</div></div>
     <div class="stat"><div class="l">To collect</div><div class="v num" style="color:var(--warn)">${fmt(M.pendingValue+M.cpVariance)}</div></div>
     <div class="stat"><div class="l">Not issued</div><div class="v num" style="color:var(--muted)">${fmt(M.counts['Not Given']*M.price)}</div></div>
   </div>
@@ -562,19 +614,39 @@ function render(keepScroll){
       : `<div class="view"><div class="skel"></div><div class="skel" style="height:200px"></div><div class="skel"></div></div>`;
     return;
   }
+  app.classList.toggle('intro', introNext);
   app.innerHTML = `<div class="view">${VIEWS[v]()}</div><footer>Live from the Amrutham 2026 finance sheet · Last read ${fmtTime(DATA.asOf)} · All amounts in AED</footer>`;
   document.querySelectorAll('nav a').forEach(a=>a.setAttribute('aria-current', a.getAttribute('href')==='#'+v?'page':'false'));
   if(!keepScroll) window.scrollTo(0,0);
+  if(introNext){ introNext=false; countUp(); setTimeout(()=>app.classList.remove('intro'),1200); }
 }
-window.addEventListener('hashchange',()=>render(false));
+let introNext = true;
+const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+function countUp(){
+  if(reduceMotion) return;
+  document.querySelectorAll('.kpi .v, .tile .v, .stat .v, .cd-n').forEach(el=>{
+    const txt=el.textContent.trim(); if(!/^[\d,]+$/.test(txt)) return;
+    const target=+txt.replace(/,/g,''); if(!target) return;
+    const t0=performance.now(), dur=800;
+    const step=now=>{ const p=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-p,3); el.textContent=fmt(target*e); if(p<1) requestAnimationFrame(step); else el.textContent=txt; };
+    requestAnimationFrame(step);
+  });
+}
+window.addEventListener('hashchange',()=>{ introNext=true; render(false); });
 app.addEventListener('click',e=>{
   if(e.target.id==='retry'){ loadState='loading'; render(true); load(); return; }
+  const dot = e.target.closest('[data-book]');
+  if(dot){ const no=dot.dataset.book; cpQuery = cpQuery.trim()===no ? '' : no; cpFilter='all'; openMember=null;
+    const inp=document.getElementById('cp-search'); if(inp) inp.value=cpQuery;
+    document.querySelectorAll('.dot.sel').forEach(d=>d.classList.remove('sel')); if(cpQuery) dot.classList.add('sel');
+    document.getElementById('dot-info').innerHTML=dotInfo(); document.getElementById('cp-list').innerHTML=memberList();
+    document.querySelectorAll('[data-f]').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.f==='all'))); return; }
   const f = e.target.closest('[data-f]'); if(f){ cpFilter=f.dataset.f; openMember=null; render(true); return; }
   const m = e.target.closest('[data-m]'); if(m){ openMember = openMember===m.dataset.m?null:m.dataset.m; document.getElementById('cp-list').innerHTML = memberList(); return; }
   const l = e.target.closest('[data-l]'); if(l){ openLine = openLine===l.dataset.l?null:l.dataset.l; render(true); return; }
 });
 app.addEventListener('input',e=>{
-  if(e.target.id==='cp-search'){ cpQuery=e.target.value; openMember=null; document.getElementById('cp-list').innerHTML = memberList(); }
+  if(e.target.id==='cp-search'){ cpQuery=e.target.value; openMember=null; document.getElementById('cp-list').innerHTML = memberList(); const di=document.getElementById('dot-info'); if(di){ di.innerHTML=dotInfo(); document.querySelectorAll('.dot').forEach(d=>d.classList.toggle('sel', d.dataset.book===cpQuery.trim())); } }
 });
 const topEl = document.getElementById('top');
 window.addEventListener('scroll',()=>topEl.classList.toggle('scrolled',window.scrollY>4),{passive:true});
