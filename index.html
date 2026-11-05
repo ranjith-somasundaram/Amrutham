@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F6F6FA">
+<title>Nattarangu Finance</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Chettan+2:wght@500;600;700;800&family=Manjari:wght@700&family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+/* Layout: a phone-first app shell. One column with a bottom tab bar on phones; a wider two-column canvas with top tabs on desktop. Stage-light gold on clean white, the festival's indigo for ink. */
+:root{
+  --bg:#F6F6FA; --panel:#FFFFFF; --panel-2:#F1F0F7; --ink:#1C1745; --muted:#6D6A8A; --line:#E6E4F0;
+  --indigo:#3A2B93; --indigo-soft:#ECE9FB; --gold:#C98A12; --gold-ink:#8A5C00; --gold-soft:#FFF4DA;
+  --good:#1F8A5B; --good-soft:#E3F5EC; --warn:#D2761A; --warn-soft:#FDEEDD; --bad:#C2384E; --bad-soft:#FBE5E9;
+  --idle:#A9A6C0; --idle-soft:#EEEDF4;
+  --shadow:0 1px 2px rgba(28,23,69,.05),0 8px 24px -12px rgba(28,23,69,.14);
+  --f-display:"Baloo Chettan 2","Manjari",system-ui,sans-serif;
+  --f-body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r-lg:22px; --r-md:16px; --r-sm:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F0D22; --panel:#18153A; --panel-2:#211D48; --ink:#F2F0FB; --muted:#A29FC2; --line:#2C2858;
+  --indigo:#B3A6FF; --indigo-soft:#2A2463; --gold:#F2B33D; --gold-ink:#F7C766; --gold-soft:#3A2E12;
+  --good:#4CC98E; --good-soft:#163828; --warn:#F09A48; --warn-soft:#3B2614; --bad:#F06C82; --bad-soft:#3E1A24;
+  --idle:#6E6A97; --idle-soft:#26224F; --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px -14px rgba(0,0,0,.6); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F0D22; --panel:#18153A; --panel-2:#211D48; --ink:#F2F0FB; --muted:#A29FC2; --line:#2C2858;
+  --indigo:#B3A6FF; --indigo-soft:#2A2463; --gold:#F2B33D; --gold-ink:#F7C766; --gold-soft:#3A2E12;
+  --good:#4CC98E; --good-soft:#163828; --warn:#F09A48; --warn-soft:#3B2614; --bad:#F06C82; --bad-soft:#3E1A24;
+  --idle:#6E6A97; --idle-soft:#26224F; --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px -14px rgba(0,0,0,.6); color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+button{font:inherit;color:inherit}
+.num{font-variant-numeric:tabular-nums}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 120px}
+
+/* Header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid transparent}
+.top.scrolled{border-bottom-color:var(--line)}
+.top-in{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px;display:flex;align-items:center;gap:14px}
+.brand{display:flex;flex-direction:column;min-width:0}
+.brand .ml{font-family:"Manjari","Noto Sans Malayalam","Kartika",sans-serif;font-weight:700;font-size:26px;line-height:1.1;color:var(--ink);letter-spacing:.2px}
+.brand .sub{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-ink)}
+.asof{margin-left:auto;font-size:11.5px;color:var(--muted);text-align:right;white-space:nowrap}
+.asof b{display:block;color:var(--ink);font-weight:700}
+.live{display:inline-flex;align-items:center;gap:6px;font-weight:700}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--idle)}
+.live[data-s="live"] i{background:var(--good);box-shadow:0 0 0 0 var(--good);animation:pulse 2s infinite}
+.live[data-s="stale"] i{background:var(--warn)}
+.live[data-s="error"] i{background:var(--bad)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--good) 60%,transparent)}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.state{padding:48px 20px;text-align:center;color:var(--muted)}
+.state b{display:block;color:var(--ink);font-size:17px;margin-bottom:6px}
+.state button{margin-top:16px;border:0;background:var(--indigo);color:var(--panel);padding:10px 20px;border-radius:999px;font-weight:800;cursor:pointer}
+.skel{height:120px;border-radius:var(--r-lg);background:linear-gradient(90deg,var(--panel-2),var(--panel),var(--panel-2));background-size:200% 100%;animation:sk 1.2s infinite}
+@keyframes sk{to{background-position:-200% 0}}
+.tabs-top{display:none;gap:4px;background:var(--panel-2);padding:4px;border-radius:999px;margin-left:24px}
+.tabs-top a{padding:7px 16px;border-radius:999px;text-decoration:none;color:var(--muted);font-weight:700;font-size:14px}
+.tabs-top a[aria-current="page"]{background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
+
+/* Bottom tab bar */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:25;background:color-mix(in srgb,var(--panel) 92%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px));padding-top:6px;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(4,1fr)}
+.tabbar a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;text-decoration:none;color:var(--muted);font-size:11.5px;font-weight:700;border-radius:12px}
+.tabbar a svg{width:23px;height:23px}
+.tabbar a[aria-current="page"]{color:var(--indigo)}
+.tabbar a[aria-current="page"] .ic{background:var(--indigo-soft)}
+.tabbar .ic{display:grid;place-items:center;width:52px;height:30px;border-radius:999px;transition:background .2s}
+@media (min-width:760px){.tabbar{display:none}.tabs-top{display:flex}.wrap{padding-block:0 56px}}
+
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--indigo);outline-offset:2px}
+
+/* Generic */
+.view{display:flex;flex-direction:column;gap:16px;padding-top:8px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);padding:18px;min-width:0}
+.eyebrow{font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+h2.sec{font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1.1;margin:0;text-wrap:balance}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:8px}
+.sec-head .meta{font-size:13px;color:var(--muted)}
+.aed{font-size:.5em;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-right:4px;vertical-align:.45em;font-family:var(--f-body)}
+.big{font-family:var(--f-display);font-weight:800;line-height:.95;letter-spacing:-.5px}
+.muted{color:var(--muted)}
+.grid2{display:grid;gap:16px;grid-template-columns:1fr}
+@media (min-width:900px){.grid2{grid-template-columns:1.15fr 1fr;align-items:start}}
+
+/* Hero */
+.hero{position:relative;border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow);background:#1b1442;aspect-ratio:16/10;max-width:100%}
+.hero img{width:100%;height:100%;object-fit:cover;object-position:50% 18%;display:block}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,10,40,0) 45%,rgba(15,10,40,.82) 100%)}
+.hero .cap{position:absolute;left:16px;right:16px;bottom:14px;z-index:1;color:#fff;display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+.hero .cap .t{font-family:var(--f-display);font-weight:700;font-size:20px;line-height:1.1}
+.hero .cap .s{font-size:13px;font-weight:700;letter-spacing:.02em}
+.chip-gold{background:#F2B33D;color:#2A1A00;font-weight:800;font-size:11.5px;padding:5px 10px;border-radius:999px;white-space:nowrap;letter-spacing:.04em}
+@media (min-width:900px){.hero{aspect-ratio:auto;height:100%;min-height:340px}}
+
+/* Cash card */
+.cash .big{font-size:56px}
+.cash .row{display:flex;gap:10px;margin-top:16px}
+.flow{flex:1;border-radius:var(--r-md);padding:12px 14px;min-width:0}
+.flow.in{background:var(--good-soft)} .flow.out{background:var(--bad-soft)}
+.flow .l{font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px}
+.flow.in .l{color:var(--good)} .flow.out .l{color:var(--bad)}
+.flow .v{font-family:var(--f-display);font-weight:700;font-size:24px;line-height:1.1;margin-top:2px}
+.split{height:10px;border-radius:999px;background:var(--bad-soft);overflow:hidden;margin-top:14px;display:flex}
+.split i{display:block;height:100%;background:var(--good)}
+.note{font-size:13px;color:var(--muted);margin-top:10px}
+
+/* Budget meter */
+.meter{display:flex;gap:18px;align-items:center}
+.ring{flex:0 0 auto;width:132px;height:132px;position:relative}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .c{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring .c b{font-family:var(--f-display);font-size:30px;font-weight:800;line-height:1}
+.ring .c span{display:block;font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.meter dl{margin:0;display:grid;gap:10px;flex:1;min-width:0}
+.meter dt{font-size:12px;color:var(--muted);font-weight:700}
+.meter dd{margin:0;font-weight:800;font-size:17px}
+.legend-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:1px}
+
+/* Tiles */
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (min-width:900px){.tiles{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tile{display:flex;flex-direction:column;gap:6px;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:var(--r-md);padding:14px;box-shadow:var(--shadow);cursor:pointer;text-decoration:none;color:var(--ink);transition:transform .15s,border-color .15s;min-width:0}
+.tile:hover{border-color:var(--indigo);transform:translateY(-1px)}
+.tile .top-row{display:flex;justify-content:space-between;align-items:center}
+.tile .ico{width:34px;height:34px;border-radius:11px;display:grid;place-items:center}
+.tile .ico svg{width:19px;height:19px}
+.tile .arrow{color:var(--muted)}
+.tile .v{font-family:var(--f-display);font-weight:800;font-size:27px;line-height:1}
+.tile .l{font-size:13px;font-weight:700}
+.tile .s{font-size:12px;color:var(--muted)}
+.mini{height:5px;border-radius:999px;background:var(--panel-2);overflow:hidden;margin-top:2px}
+.mini i{display:block;height:100%;border-radius:999px}
+
+/* Attention list */
+.alerts{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.alerts li{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:var(--r-md);background:var(--panel-2)}
+.alerts .dot{flex:0 0 auto;width:10px;height:10px;border-radius:50%;margin-top:6px}
+.alerts b{font-weight:800}
+.alerts .t{font-size:14px}
+.alerts .s{font-size:12.5px;color:var(--muted)}
+
+/* P&L strip */
+.pl{display:grid;grid-template-columns:1fr auto;row-gap:8px;column-gap:12px;font-size:14.5px}
+.pl .k{color:var(--muted);font-weight:600}
+.pl .v{text-align:right;font-weight:800}
+.pl .tot{border-top:1px dashed var(--line);padding-top:10px;font-size:16px;color:var(--ink)}
+.pl .tot.v{color:var(--good)}
+
+/* Coupons */
+.stack{display:flex;height:18px;border-radius:999px;overflow:hidden;gap:2px;background:var(--panel-2)}
+.stack i{display:block;height:100%}
+.leg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+@media (min-width:600px){.leg{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.leg div{padding:10px 12px;border-radius:12px;background:var(--panel-2)}
+.leg .n{font-family:var(--f-display);font-weight:800;font-size:24px;line-height:1}
+.leg .l{font-size:12px;font-weight:700;color:var(--muted)}
+.stats3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stat{padding:12px;border-radius:var(--r-md);background:var(--panel);border:1px solid var(--line);min-width:0}
+.stat .l{font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.stat .v{font-family:var(--f-display);font-weight:800;font-size:22px;line-height:1.1;margin-top:2px}
+
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.seg{display:inline-flex;background:var(--panel-2);padding:4px;border-radius:999px;gap:2px}
+.seg button{border:0;background:transparent;padding:7px 14px;border-radius:999px;font-weight:700;font-size:13.5px;color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
+.search{flex:1;min-width:160px;position:relative}
+.search input{width:100%;border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:10px 14px 10px 38px;font:inherit;font-size:14px;color:var(--ink)}
+.search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted)}
+
+.list{display:flex;flex-direction:column;gap:8px}
+.item{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden}
+.item>button{width:100%;display:flex;align-items:center;gap:12px;padding:13px 14px;background:transparent;border:0;cursor:pointer;text-align:left}
+.avatar{flex:0 0 auto;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:14px;background:var(--indigo-soft);color:var(--indigo)}
+.item .mid{flex:1;min-width:0}
+.item .nm{font-weight:800;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .sb{font-size:12.5px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.item .rt{text-align:right;flex:0 0 auto}
+.item .rt .a{font-family:var(--f-display);font-weight:800;font-size:19px;line-height:1}
+.item .rt .b{font-size:11.5px;color:var(--muted);font-weight:700}
+.chev{flex:0 0 auto;color:var(--muted);transition:transform .2s}
+.item[data-open="true"] .chev{transform:rotate(90deg)}
+.detail{padding:0 14px 14px 64px;display:flex;flex-direction:column;gap:10px}
+@media (max-width:420px){.detail{padding-left:14px}}
+.books{display:flex;flex-wrap:wrap;gap:6px}
+.bk{font-size:12px;font-weight:800;padding:4px 9px;border-radius:8px}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.s-received{background:var(--good-soft);color:var(--good)}
+.s-partial{background:var(--gold-soft);color:var(--gold-ink)}
+.s-pending{background:var(--warn-soft);color:var(--warn)}
+.s-notgiven{background:var(--idle-soft);color:var(--muted)}
+.s-missing{background:var(--bad-soft);color:var(--bad)}
+.rem{font-size:12.5px;color:var(--muted);border-left:3px solid var(--line);padding-left:10px}
+.rem b{color:var(--ink)}
+.empty{padding:28px 16px;text-align:center;color:var(--muted);font-size:14px;background:var(--panel);border:1px dashed var(--line);border-radius:var(--r-md)}
+
+/* Budget */
+.bline{display:flex;flex-direction:column;gap:7px}
+.bline .hd{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.bline .nm{font-weight:700;font-size:14.5px;min-width:0}
+.bline .am{font-size:13px;color:var(--muted);white-space:nowrap}
+.bline .am b{color:var(--ink)}
+.bar{height:8px;border-radius:999px;background:var(--panel-2);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:999px;background:var(--indigo)}
+.bar i.over{background:var(--bad)}
+.blist{display:flex;flex-direction:column}
+.blist>button{all:unset;cursor:pointer;display:block;padding:14px 4px;border-bottom:1px solid var(--line)}
+.blist>button:focus-visible{outline:2px solid var(--indigo);outline-offset:2px;border-radius:8px}
+.blist>button:last-child{border-bottom:0}
+.pays{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.pay{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:8px 10px;border-radius:10px;background:var(--panel-2)}
+.pay .w{min-width:0}
+.pay .w b{display:block;font-weight:700}
+.pay .w span{color:var(--muted);font-size:12px}
+
+/* Sponsors */
+.sp-total .big{font-size:46px}
+.sp-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.sp-row:last-child{border-bottom:0}
+.sp-row .mid{flex:1;min-width:0}
+.sp-row .nm{font-weight:800;font-size:15.5px}
+.sp-row .sb{font-size:12.5px;color:var(--muted)}
+.sp-row .amt{font-family:var(--f-display);font-weight:800;font-size:22px}
+.share{height:6px;background:var(--panel-2);border-radius:999px;overflow:hidden;margin-top:7px}
+.share i{display:block;height:100%;background:var(--gold);border-radius:999px}
+
+footer{margin-top:28px;font-size:12px;color:var(--muted);text-align:center}
+
+@media (prefers-reduced-motion:no-preference){
+  .view>*{animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
+  .view>*:nth-child(2){animation-delay:.04s}.view>*:nth-child(3){animation-delay:.08s}.view>*:nth-child(4){animation-delay:.12s}.view>*:nth-child(5){animation-delay:.16s}
+  @keyframes rise{from{transform:translateY(8px)}to{transform:none}}
+  .ring circle.val{transition:stroke-dashoffset .9s cubic-bezier(.2,.7,.2,1)}
+}
+</style>
+</head>
+<body>
+<header class="top" id="top">
+  <div class="top-in">
+    <div class="brand">
+      <span class="sub">Amrutham · 41st Anniversary</span>
+      <span class="ml" lang="ml">നാട്ടരങ്ങ്</span>
+    </div>
+    <nav class="tabs-top" aria-label="Sections">
+      <a href="#overview">Overview</a><a href="#coupons">Coupons</a><a href="#budget">Budget</a><a href="#sponsors">Sponsors</a>
+    </nav>
+    <div class="asof"><span class="live" id="live" data-s="loading"><i></i><span id="live-t">Connecting</span></span><b id="asof">—</b></div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<nav class="tabbar" aria-label="Sections">
+  <a href="#overview"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/></svg></span>Overview</a>
+  <a href="#coupons"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"/><path d="M14 6v12" stroke-dasharray="2 2"/></svg></span>Coupons</a>
+  <a href="#budget"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>Budget</a>
+  <a href="#sponsors"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"/></svg></span>Sponsors</a>
+</nav>
+
+<script>
+/* ===== SETTINGS: paste your Apps Script web app URL here ===== */
+const CONFIG = {
+  DATA_URL: "https://script.google.com/macros/s/AKfycbwyj3kD7d8rHvvoaVhoJZvMzO3EOrVD-M_HGfCKC2Ztp7yx084E5bjoB9PMJifdyeos/exec",
+  REFRESH_SECONDS: 60
+};
+const POSTER = "poster.jpg";
+let DATA = null, M = null, lastLoaded = null, lastJson = "", loadState = "loading", loadError = "";
+
+/* ---------- helpers ---------- */
+const fmt = n => Math.round(n).toLocaleString('en-US');
+const pct = (a,b) => b ? a/b : 0;
+const pctTxt = x => (x*100).toFixed(x<0.1&&x>0?1:0)+'%';
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const dShort = s => { if(!s) return ''; const d=new Date(s+'T00:00:00'); return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}); };
+const initials = n => n.split(/[\s./]+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+const SVG = {
+  arrow:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+  up:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
+  down:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>',
+  star:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"/></svg>',
+  ticket:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"/></svg>',
+  wallet:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7H5a2 2 0 0 1 0-4h13v4"/><path d="M3 5v14a2 2 0 0 0 2 2h15V7"/><circle cx="16" cy="14" r="1.5"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>'
+};
+const STATUS = {
+  'Received':{cls:'s-received',label:'Paid',color:'var(--good)'},
+  'Partially Received':{cls:'s-partial',label:'Part paid',color:'var(--gold)'},
+  'Not Received':{cls:'s-pending',label:'Pending',color:'var(--warn)'},
+  'Not Given':{cls:'s-notgiven',label:'Not issued',color:'var(--idle)'},
+  'Missing':{cls:'s-missing',label:'Missing',color:'var(--bad)'}
+};
+
+/* ---------- model ---------- */
+function model(){
+  const D = DATA, price = D.bookPrice;
+  const spCollected = D.sponsors.reduce((s,x)=>s+x.collected,0);
+  const spPending = D.sponsors.reduce((s,x)=>s+x.pending,0);
+  const cpCollected = D.coupons.reduce((s,x)=>s+x.recv,0);
+  const cpVariance = D.coupons.reduce((s,x)=>s+(x.sales-x.recv),0);
+  const by = st => D.coupons.filter(c=>c.status===st);
+  const counts = Object.fromEntries(Object.keys(STATUS).map(k=>[k,by(k).length]));
+  const totalBooks = D.coupons.length;
+  const paid = D.payments.reduce((s,x)=>s+x.paid,0), due = D.payments.reduce((s,x)=>s+x.due,0);
+  const cost = paid+due;
+  const budget = D.budget.reduce((s,x)=>s+x.budget,0);
+  const collections = D.deposits + spCollected + cpCollected + D.others;
+  const receipts = spCollected + spPending + cpCollected + D.others;
+  const cash = collections - paid;
+  const pendingBooks = counts['Not Received'];
+  const pendingValue = pendingBooks*price;
+  // members
+  const mm = new Map();
+  D.coupons.forEach(c=>{
+    if(!c.name) return;
+    if(!mm.has(c.name)) mm.set(c.name,{name:c.name,books:[],held:0,paid:0,pend:0,miss:0,recv:0,variance:0});
+    const m = mm.get(c.name); m.books.push(c);
+    if(c.status!=='Not Given') m.held++;
+    if(c.status==='Received'||c.status==='Partially Received') m.paid++;
+    if(c.status==='Not Received') m.pend++;
+    if(c.status==='Missing') m.miss++;
+    m.recv += c.recv; m.variance += (c.sales-c.recv);
+  });
+  const members = [...mm.values()].map(m=>({...m,pendValue:m.pend*price+m.variance}));
+  const lines = D.budget.map(b=>{
+    const pays = D.payments.filter(p=>p.type===b.item);
+    const actual = pays.reduce((s,p)=>s+p.paid+p.due,0);
+    return {...b,actual,pays};
+  });
+  return {price,spCollected,spPending,cpCollected,cpVariance,counts,totalBooks,paid,due,cost,budget,collections,receipts,cash,pendingBooks,pendingValue,members,lines,profit:receipts-cost,toRaise:Math.max(0,budget-receipts)};
+}
+
+
+/* ---------- views ---------- */
+function vOverview(){
+  const inShare = pct(M.collections, M.collections+M.paid);
+  const fund = Math.min(1,pct(M.receipts,M.budget)), spent = Math.min(1,pct(M.cost,M.budget));
+  const R=54, C=2*Math.PI*R;
+  const ring = `<svg viewBox="0 0 132 132" role="img" aria-label="Receipts are ${pctTxt(fund)} of the budget; spending is ${pctTxt(spent)}">
+      <circle cx="66" cy="66" r="${R}" fill="none" stroke="var(--panel-2)" stroke-width="12"/>
+      <circle class="val" cx="66" cy="66" r="${R}" fill="none" stroke="var(--gold)" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-fund)}"/>
+      <circle cx="66" cy="66" r="${R-17}" fill="none" stroke="var(--panel-2)" stroke-width="7"/>
+      <circle class="val" cx="66" cy="66" r="${R-17}" fill="none" stroke="var(--bad)" stroke-width="7" stroke-linecap="round" stroke-dasharray="${2*Math.PI*(R-17)}" stroke-dashoffset="${2*Math.PI*(R-17)*(1-spent)}"/>
+    </svg>`;
+  const alerts = [];
+  if(M.pendingBooks) alerts.push({c:'var(--warn)',t:`<b>${M.pendingBooks} coupon books</b> are with members and not yet paid for`,s:`AED ${fmt(M.pendingValue)} to collect`,go:'#coupons'});
+  if(M.counts['Not Given']) alerts.push({c:'var(--idle)',t:`<b>${M.counts['Not Given']} books</b> not yet handed out`,s:`Worth AED ${fmt(M.counts['Not Given']*M.price)} if sold`,go:'#coupons'});
+  if(M.counts['Missing']) alerts.push({c:'var(--bad)',t:`<b>${M.counts['Missing']} book missing</b>`,s:esc(DATA.coupons.find(c=>c.status==='Missing')?.remarks||''),go:'#coupons'});
+  if(M.toRaise) alerts.push({c:'var(--gold)',t:`<b>AED ${fmt(M.toRaise)}</b> still to raise to cover the budget`,s:`Receipts so far cover ${pctTxt(pct(M.receipts,M.budget))} of AED ${fmt(M.budget)}`,go:'#budget'});
+  const paidBooks = M.counts['Received']+M.counts['Partially Received'];
+  return `
+  <section class="grid2">
+    <div class="hero"><img src="${POSTER}" alt="Nattarangu event poster: an Amrutham Family dance and musical extravaganza presented by Chandran Gurukkal Ayurvedic Clinic, powered by Bhima">
+      <div class="cap"><span class="s">Dance &amp; Musical Extravaganza</span><span class="chip-gold">41 YEARS</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div class="card cash">
+        <div class="eyebrow">Cash in hand</div>
+        <div class="big num" style="margin-top:6px"><span class="aed">AED</span>${fmt(M.cash)}</div>
+        <div class="row">
+          <div class="flow in"><div class="l">${SVG.up} Collected</div><div class="v num">${fmt(M.collections)}</div></div>
+          <div class="flow out"><div class="l">${SVG.down} Paid out</div><div class="v num">${fmt(M.paid)}</div></div>
+        </div>
+        <div class="split" aria-hidden="true"><i style="width:${(inShare*100).toFixed(1)}%"></i></div>
+      </div>
+      <div class="card">
+        <div class="meter">
+          <div class="ring">${ring}<div class="c"><div><b class="num">${pctTxt(fund)}</b><span>funded</span></div></div></div>
+          <dl>
+            <div><dt><span class="legend-dot" style="background:var(--gold)"></span>Receipts vs budget</dt><dd class="num">${fmt(M.receipts)} <span class="muted" style="font-weight:600">/ ${fmt(M.budget)}</span></dd></div>
+            <div><dt><span class="legend-dot" style="background:var(--bad)"></span>Spent vs budget</dt><dd class="num">${fmt(M.cost)} <span class="muted" style="font-weight:600">· ${pctTxt(spent)}</span></dd></div>
+            <div><dt>Still to raise</dt><dd class="num" style="color:var(--gold-ink)">AED ${fmt(M.toRaise)}</dd></div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="sec-head"><h2 class="sec">At a glance</h2><span class="meta">Tap to see details</span></div>
+  <section class="tiles">
+    <a class="tile" href="#sponsors">
+      <div class="top-row"><span class="ico" style="background:var(--gold-soft);color:var(--gold-ink)">${SVG.star}</span><span class="arrow">${SVG.arrow}</span></div>
+      <div class="v num">${fmt(M.spCollected)}</div><div class="l">Sponsorship</div><div class="s">${DATA.sponsors.length} sponsors · collected</div>
+    </a>
+    <a class="tile" href="#coupons">
+      <div class="top-row"><span class="ico" style="background:var(--good-soft);color:var(--good)">${SVG.ticket}</span><span class="arrow">${SVG.arrow}</span></div>
+      <div class="v num">${fmt(M.cpCollected)}</div><div class="l">Coupon money in</div><div class="s">${paidBooks} of ${M.totalBooks} books paid</div>
+      <div class="mini"><i style="width:${(pct(paidBooks,M.totalBooks)*100).toFixed(1)}%;background:var(--good)"></i></div>
+    </a>
+    <a class="tile" href="#coupons">
+      <div class="top-row"><span class="ico" style="background:var(--warn-soft);color:var(--warn)">${SVG.clock}</span><span class="arrow">${SVG.arrow}</span></div>
+      <div class="v num">${fmt(M.pendingValue)}</div><div class="l">Coupon money pending</div><div class="s">${M.pendingBooks} books with members</div>
+    </a>
+    <a class="tile" href="#budget">
+      <div class="top-row"><span class="ico" style="background:var(--bad-soft);color:var(--bad)">${SVG.wallet}</span><span class="arrow">${SVG.arrow}</span></div>
+      <div class="v num">${fmt(M.cost)}</div><div class="l">Expenses</div><div class="s">${pctTxt(pct(M.cost,M.budget))} of AED ${fmt(M.budget)} budget</div>
+      <div class="mini"><i style="width:${(spent*100).toFixed(1)}%;background:var(--bad)"></i></div>
+    </a>
+  </section>
+
+  <section class="grid2">
+    <div class="card">
+      <div class="eyebrow" style="margin-bottom:12px">Needs attention</div>
+      <ul class="alerts">${alerts.map(a=>`<li><span class="dot" style="background:${a.c}"></span><div><div class="t">${a.t}</div><div class="s">${a.s}</div></div></li>`).join('')}</ul>
+    </div>
+    <div class="card">
+      <div class="eyebrow" style="margin-bottom:12px">Event result so far</div>
+      <div class="pl num">
+        <span class="k">Sponsorship</span><span class="v">${fmt(M.spCollected+M.spPending)}</span>
+        <span class="k">Coupon sales</span><span class="v">${fmt(M.cpCollected)}</span>
+        ${DATA.others?`<span class="k">Others</span><span class="v">${fmt(DATA.others)}</span>`:''}
+        <span class="k">Less expenses</span><span class="v" style="color:var(--bad)">(${fmt(M.cost)})</span>
+        <span class="k tot">Surplus</span><span class="v tot" style="color:${M.profit>=0?'var(--good)':'var(--bad)'}">${M.profit<0?'(':''}${fmt(Math.abs(M.profit))}${M.profit<0?')':''}</span>
+      </div>
+      <p class="note">Counts only money received and expenses entered so far. Most of the AED ${fmt(M.budget)} budget is still to be spent.</p>
+    </div>
+  </section>`;
+}
+
+let cpFilter = 'pending', cpQuery = '', openMember = null;
+function vCoupons(){
+  const order = ['Received','Partially Received','Not Received','Missing','Not Given'];
+  const bar = order.filter(k=>M.counts[k]).map(k=>`<i style="width:${(pct(M.counts[k],M.totalBooks)*100).toFixed(2)}%;background:${STATUS[k].color}" title="${STATUS[k].label}: ${M.counts[k]}"></i>`).join('');
+  const leg = order.filter(k=>k!=='Partially Received'||M.counts[k]).map(k=>`<div><div class="n num" style="color:${STATUS[k].color}">${M.counts[k]}</div><div class="l">${STATUS[k].label}</div></div>`).join('');
+  return `
+  <div class="sec-head"><h2 class="sec">Coupon books</h2><span class="meta num">${M.totalBooks} books · AED ${fmt(M.price)} each</span></div>
+  <div class="card">
+    <div class="stack" role="img" aria-label="${order.map(k=>STATUS[k].label+' '+M.counts[k]).join(', ')}">${bar}</div>
+    <div class="leg">${leg}</div>
+  </div>
+  <div class="stats3">
+    <div class="stat"><div class="l">Collected</div><div class="v num" style="color:var(--good)">${fmt(M.cpCollected)}</div></div>
+    <div class="stat"><div class="l">To collect</div><div class="v num" style="color:var(--warn)">${fmt(M.pendingValue+M.cpVariance)}</div></div>
+    <div class="stat"><div class="l">Not issued</div><div class="v num" style="color:var(--muted)">${fmt(M.counts['Not Given']*M.price)}</div></div>
+  </div>
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Show members">
+      <button type="button" data-f="pending" aria-pressed="${cpFilter==='pending'}">To collect</button>
+      <button type="button" data-f="paid" aria-pressed="${cpFilter==='paid'}">Paid</button>
+      <button type="button" data-f="all" aria-pressed="${cpFilter==='all'}">All</button>
+    </div>
+    <label class="search">${SVG.search}<input id="cp-search" type="search" placeholder="Search member or book no." value="${esc(cpQuery)}" aria-label="Search member or book number"></label>
+  </div>
+  <div class="list" id="cp-list">${memberList()}</div>`;
+}
+function memberList(){
+  const q = cpQuery.trim().toLowerCase();
+  let ms = M.members.filter(m=>m.held>0||cpFilter==='all');
+  if(cpFilter==='pending') ms = ms.filter(m=>m.pend>0||m.variance>0||m.miss>0);
+  if(cpFilter==='paid') ms = ms.filter(m=>m.paid>0);
+  if(q) ms = ms.filter(m=>m.name.toLowerCase().includes(q)||m.books.some(b=>String(b.no)===q));
+  ms.sort(cpFilter==='paid'?(a,b)=>b.recv-a.recv||a.name.localeCompare(b.name):(a,b)=>b.pendValue-a.pendValue||b.miss-a.miss||a.name.localeCompare(b.name));
+  if(!ms.length) return `<div class="empty">No members match. Try another name or book number.</div>`;
+  return ms.map(m=>{
+    const open = openMember===m.name || (q && ms.length===1);
+    const right = cpFilter==='paid'
+      ? `<div class="a num" style="color:var(--good)">${fmt(m.recv)}</div><div class="b">received</div>`
+      : (m.pendValue? `<div class="a num" style="color:var(--warn)">${fmt(m.pendValue)}</div><div class="b">to collect</div>` : `<div class="a num" style="color:var(--good)">${fmt(m.recv)}</div><div class="b">paid</div>`);
+    const pills = [
+      m.paid?`<span class="pill s-received">${m.paid} paid</span>`:'',
+      m.pend?`<span class="pill s-pending">${m.pend} pending</span>`:'',
+      m.miss?`<span class="pill s-missing">${m.miss} missing</span>`:''
+    ].join('');
+    const remarks = [...new Set(m.books.filter(b=>b.remarks).map(b=>b.remarks))];
+    return `<div class="item" data-open="${open}">
+      <button type="button" data-m="${esc(m.name)}" aria-expanded="${open}">
+        <span class="avatar">${esc(initials(m.name))}</span>
+        <span class="mid"><span class="nm" style="display:block">${esc(m.name)}</span><span class="sb">${m.held} book${m.held===1?'':'s'} ${pills}</span></span>
+        <span class="rt">${right}</span><span class="chev">${SVG.arrow}</span>
+      </button>
+      ${open?`<div class="detail">
+        <div class="books">${m.books.map(b=>`<span class="bk ${STATUS[b.status]?.cls||''}" title="${esc(STATUS[b.status]?.label||b.status)}">#${b.no}${b.date?' · '+dShort(b.date):''}</span>`).join('')}</div>
+        ${remarks.map(r=>`<div class="rem">${esc(r)}</div>`).join('')}
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+let openLine = null;
+function vBudget(){
+  const remain = M.budget-M.cost;
+  return `
+  <div class="sec-head"><h2 class="sec">Budget</h2><span class="meta num">AED ${fmt(M.budget)} approved</span></div>
+  <div class="stats3">
+    <div class="stat"><div class="l">Budget</div><div class="v num">${fmt(M.budget)}</div></div>
+    <div class="stat"><div class="l">Spent</div><div class="v num" style="color:var(--bad)">${fmt(M.cost)}</div></div>
+    <div class="stat"><div class="l">Remaining</div><div class="v num" style="color:var(--indigo)">${fmt(remain)}</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="eyebrow">By line item</div>
+      <div class="blist">${[...M.lines].sort((a,b)=>b.actual-a.actual||b.budget-a.budget).map(l=>{
+        const p = pct(l.actual,l.budget), open = openLine===l.item;
+        return `<button type="button" data-l="${esc(l.item)}" aria-expanded="${open}"><div class="bline">
+          <div class="hd"><span class="nm">${esc(l.item)}</span><span class="am num"><b>${fmt(l.actual)}</b> / ${fmt(l.budget)}</span></div>
+          <div class="bar"><i class="${p>1?'over':''}" style="width:${Math.min(100,p*100).toFixed(1)}%"></i></div>
+          ${open?`<div class="pays">${l.pays.length?l.pays.map(p=>`<div class="pay"><span class="w"><b>${esc(p.item)}</b><span>${dShort(p.date)} · ${p.due?'Not paid':'Paid by '+esc(p.by||'—')}</span></span><b class="num">${fmt(p.paid+p.due)}</b></div>`).join(''):`<div class="pay"><span class="w"><span>No payments yet</span></span></div>`}</div>`:''}
+        </div></button>`;}).join('')}</div>
+    </div>
+    <div class="card">
+      <div class="eyebrow" style="margin-bottom:10px">Payments so far</div>
+      <div class="pays" style="margin-top:0">${DATA.payments.length?[...DATA.payments].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(p=>`<div class="pay"><span class="w"><b>${esc(p.item)}</b><span>${dShort(p.date)} · ${esc(p.type)} · ${p.due?'<span style="color:var(--warn);font-weight:700">Not paid</span>':'Paid by '+esc(p.by||'—')}</span></span><b class="num">${fmt(p.paid+p.due)}</b></div>`).join(''):'<div class="empty">No payments entered yet.</div>'}</div>
+      <div class="pl num" style="margin-top:14px">
+        <span class="k">Paid</span><span class="v">${fmt(M.paid)}</span>
+        <span class="k">Not yet paid</span><span class="v" style="color:var(--warn)">${fmt(M.due)}</span>
+        <span class="k tot">Total</span><span class="v tot" style="color:var(--ink)">${fmt(M.cost)}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function vSponsors(){
+  const tot = M.spCollected+M.spPending;
+  const list = [...DATA.sponsors].sort((a,b)=>(b.collected+b.pending)-(a.collected+a.pending));
+  return `
+  <div class="sec-head"><h2 class="sec">Sponsors</h2><span class="meta">${list.length} received</span></div>
+  <div class="card sp-total">
+    <div class="eyebrow">Sponsorship collected</div>
+    <div class="big num" style="margin-top:6px"><span class="aed">AED</span>${fmt(M.spCollected)}</div>
+    ${M.spPending?`<p class="note">Plus AED ${fmt(M.spPending)} promised, not yet collected.</p>`:`<p class="note">Only sponsorships already collected are shown.</p>`}
+  </div>
+  <div class="card">
+    ${list.map(s=>{const a=s.collected+s.pending;return `<div class="sp-row">
+      <span class="avatar" style="background:var(--gold-soft);color:var(--gold-ink)">${esc(initials(s.name))}</span>
+      <div class="mid"><div class="nm">${esc(s.name)}</div>
+        <div class="sb">${dShort(s.date)}${s.resp?' · Via '+esc(s.resp):''}${s.by?' · Received by '+esc(s.by):''}</div>
+        <div class="share"><i style="width:${(pct(a,tot)*100).toFixed(1)}%"></i></div></div>
+      <div style="text-align:right"><div class="amt num">${fmt(a)}</div>${s.pending?`<span class="pill s-pending">${fmt(s.pending)} pending</span>`:`<span class="pill s-received">Collected</span>`}</div>
+    </div>`;}).join('')}
+  </div>`;
+}
+
+/* ---------- router ---------- */
+const VIEWS = {overview:vOverview, coupons:vCoupons, budget:vBudget, sponsors:vSponsors};
+const app = document.getElementById('app');
+function current(){ const h = location.hash.replace('#',''); return VIEWS[h]?h:'overview'; }
+function render(keepScroll){
+  const v = current();
+  document.querySelectorAll('nav a').forEach(a=>a.setAttribute('aria-current', a.getAttribute('href')==='#'+v?'page':'false'));
+  if(!DATA){
+    app.innerHTML = loadState==='error'
+      ? `<div class="state"><b>Couldn't load the figures</b>${esc(loadError)}<br><button type="button" id="retry">Try again</button></div>`
+      : `<div class="view"><div class="skel"></div><div class="skel" style="height:200px"></div><div class="skel"></div></div>`;
+    return;
+  }
+  app.innerHTML = `<div class="view">${VIEWS[v]()}</div><footer>Live from the Amrutham 2026 finance sheet · Last read ${fmtTime(DATA.asOf)} · All amounts in AED</footer>`;
+  document.querySelectorAll('nav a').forEach(a=>a.setAttribute('aria-current', a.getAttribute('href')==='#'+v?'page':'false'));
+  if(!keepScroll) window.scrollTo(0,0);
+}
+window.addEventListener('hashchange',()=>render(false));
+app.addEventListener('click',e=>{
+  if(e.target.id==='retry'){ loadState='loading'; render(true); load(); return; }
+  const f = e.target.closest('[data-f]'); if(f){ cpFilter=f.dataset.f; openMember=null; render(true); return; }
+  const m = e.target.closest('[data-m]'); if(m){ openMember = openMember===m.dataset.m?null:m.dataset.m; document.getElementById('cp-list').innerHTML = memberList(); return; }
+  const l = e.target.closest('[data-l]'); if(l){ openLine = openLine===l.dataset.l?null:l.dataset.l; render(true); return; }
+});
+app.addEventListener('input',e=>{
+  if(e.target.id==='cp-search'){ cpQuery=e.target.value; openMember=null; document.getElementById('cp-list').innerHTML = memberList(); }
+});
+const topEl = document.getElementById('top');
+window.addEventListener('scroll',()=>topEl.classList.toggle('scrolled',window.scrollY>4),{passive:true});
+
+/* ---------- live data ---------- */
+function fmtTime(iso){ const d=new Date(iso); return d.toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }
+function setStatus(s, text){ const el=document.getElementById('live'); el.dataset.s=s; document.getElementById('live-t').textContent=text; }
+function showTime(){ if(DATA) document.getElementById('asof').textContent = fmtTime(DATA.asOf); }
+function valid(d){ return d && Array.isArray(d.budget) && Array.isArray(d.coupons) && Array.isArray(d.sponsors) && Array.isArray(d.payments); }
+function useData(d, json, fromCache){
+  const key = JSON.stringify(Object.assign({}, d, {asOf:null}));
+  if(key===lastJson){ DATA.asOf=d.asOf; showTime(); return; }   // unchanged: keep the view (and any open search) as it is
+  lastJson=key; DATA=d; M=model(); render(true); showTime();
+  if(!fromCache){ try{ localStorage.setItem('amrutham-data', json); }catch(e){} }
+}
+function jsonp(url){
+  return new Promise((res,rej)=>{
+    const cb='amr_'+Date.now(), s=document.createElement('script');
+    const done=()=>{ delete window[cb]; s.remove(); clearTimeout(timer); };
+    const timer=setTimeout(()=>{ done(); rej(new Error('timeout')); },15000);
+    window[cb]=d=>{ done(); res(d); };
+    s.onerror=()=>{ done(); rej(new Error('network')); };
+    s.src=url+(url.includes('?')?'&':'?')+'callback='+cb;
+    document.head.appendChild(s);
+  });
+}
+let loading=false;
+async function load(){
+  if(loading) return; loading=true;
+  if(!/^https?:/.test(CONFIG.DATA_URL) && !CONFIG.DATA_URL.endsWith('.json')){
+    loadState='error'; loadError='Add the Apps Script web app link to DATA_URL in index.html.'; setStatus('error','Not set up'); if(!DATA) render(true); loading=false; return;
+  }
+  try{
+    let d;
+    try{ const r=await fetch(CONFIG.DATA_URL,{cache:'no-store',redirect:'follow'}); if(!r.ok) throw new Error('HTTP '+r.status); d=await r.json(); }
+    catch(e){ if(CONFIG.DATA_URL.endsWith('.json')) throw e; d=await jsonp(CONFIG.DATA_URL); }
+    if(!valid(d)) throw new Error('The sheet returned data in an unexpected shape.');
+    useData(d, JSON.stringify(d), false); lastLoaded=Date.now(); loadState='live'; setStatus('live','Live');
+  }catch(e){
+    loadError = navigator.onLine===false ? 'You appear to be offline.' : 'Check the DATA_URL link and that the web app is deployed for "Anyone".';
+    if(DATA){ setStatus('stale','Offline'); } else { loadState='error'; setStatus('error','Error'); render(true); }
+  }finally{ loading=false; }
+}
+(function boot(){
+  try{ const c=localStorage.getItem('amrutham-data'); if(c){ const d=JSON.parse(c); if(valid(d)){ useData(d,c,true); setStatus('stale','Updating'); } } }catch(e){}
+  if(!DATA) render(true);
+  load();
+  setInterval(()=>{ if(document.visibilityState==='visible') load(); }, Math.max(15,CONFIG.REFRESH_SECONDS)*1000);
+  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible' && (!lastLoaded || Date.now()-lastLoaded>15000)) load(); });
+  window.addEventListener('online', load);
+})();
+</script>
+</body>
+</html>
