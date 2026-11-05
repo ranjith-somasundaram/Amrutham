@@ -53,7 +53,11 @@ button{font:inherit;color:inherit}
 .brand .sub{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-ink)}
 .asof{margin-left:auto;font-size:11.5px;color:var(--muted);text-align:right;white-space:nowrap}
 .asof b{display:block;color:var(--ink);font-weight:700}
-.live{display:inline-flex;align-items:center;gap:6px;font-weight:700}
+.live{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:11.5px;color:var(--ink);background:var(--panel-2);border:0;border-radius:999px;padding:4px 9px;cursor:pointer;margin-bottom:2px}
+.live:hover{background:var(--indigo-soft)}
+.live .rf{width:12px;height:12px;color:var(--muted)}
+.live.spin .rf{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .live i{width:8px;height:8px;border-radius:50%;background:var(--idle)}
 .live[data-s="live"] i{background:var(--good);box-shadow:0 0 0 0 var(--good);animation:pulse 2s infinite}
 .live[data-s="stale"] i{background:var(--warn)}
@@ -253,7 +257,7 @@ footer{margin-top:28px;font-size:12px;color:var(--muted);text-align:center}
     <nav class="tabs-top" aria-label="Sections">
       <a href="#overview">Overview</a><a href="#coupons">Coupons</a><a href="#budget">Budget</a><a href="#sponsors">Sponsors</a>
     </nav>
-    <div class="asof"><span class="live" id="live" data-s="loading"><i></i><span id="live-t">Connecting</span></span><b id="asof">—</b></div>
+    <div class="asof"><button type="button" class="live" id="live" data-s="loading" aria-label="Refresh figures"><i></i><span id="live-t">Connecting</span><svg class="rf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 4v5h-5"/></svg></button><b id="asof">—</b></div>
   </div>
 </header>
 
@@ -592,8 +596,9 @@ function jsonp(url){
   });
 }
 let loading=false;
-async function load(){
+async function load(manual){
   if(loading) return; loading=true;
+  const btn=document.getElementById('live'); const t0=Date.now(); if(manual){ btn.classList.add('spin'); setStatus(btn.dataset.s,'Checking'); }
   if(!/^https?:/.test(CONFIG.DATA_URL) && !CONFIG.DATA_URL.endsWith('.json')){
     loadState='error'; loadError='Add the Apps Script web app link to DATA_URL in index.html.'; setStatus('error','Not set up'); if(!DATA) render(true); loading=false; return;
   }
@@ -602,11 +607,12 @@ async function load(){
     try{ const r=await fetch(CONFIG.DATA_URL,{cache:'no-store',redirect:'follow'}); if(!r.ok) throw new Error('HTTP '+r.status); d=await r.json(); }
     catch(e){ if(CONFIG.DATA_URL.endsWith('.json')) throw e; d=await jsonp(CONFIG.DATA_URL); }
     if(!valid(d)) throw new Error('The sheet returned data in an unexpected shape.');
-    useData(d, JSON.stringify(d), false); lastLoaded=Date.now(); loadState='live'; setStatus('live','Live');
+    useData(d, JSON.stringify(d), false); lastLoaded=Date.now(); loadState='live';
+    if(manual){ const wait=Math.max(0,600-(Date.now()-t0)); setTimeout(()=>{ setStatus('live','Updated'); setTimeout(()=>setStatus('live','Live'),2000); },wait); } else setStatus('live','Live');
   }catch(e){
     loadError = navigator.onLine===false ? 'You appear to be offline.' : 'Check the DATA_URL link and that the web app is deployed for "Anyone".';
     if(DATA){ setStatus('stale','Offline'); } else { loadState='error'; setStatus('error','Error'); render(true); }
-  }finally{ loading=false; }
+  }finally{ loading=false; setTimeout(()=>document.getElementById('live').classList.remove('spin'), Math.max(0,600-(Date.now()-t0))); }
 }
 (function boot(){
   try{ const c=localStorage.getItem('amrutham-data'); if(c){ const d=JSON.parse(c); if(valid(d)){ useData(d,c,true); setStatus('stale','Updating'); } } }catch(e){}
@@ -614,7 +620,8 @@ async function load(){
   load();
   setInterval(()=>{ if(document.visibilityState==='visible') load(); }, Math.max(15,CONFIG.REFRESH_SECONDS)*1000);
   document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible' && (!lastLoaded || Date.now()-lastLoaded>15000)) load(); });
-  window.addEventListener('online', load);
+  window.addEventListener('online', ()=>load());
+  document.getElementById('live').addEventListener('click', ()=>load(true));
 })();
 </script>
 </body>
