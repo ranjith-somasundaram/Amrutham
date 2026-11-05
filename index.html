@@ -99,6 +99,17 @@ h2.sec{font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1
 /* Hero */
 .hero{position:relative;border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow);background:#1b1442;aspect-ratio:1070/424;max-width:100%}
 .hero img{width:100%;height:100%;object-fit:cover;display:block}
+.top-grid{display:grid;gap:16px;grid-template-columns:1fr}
+.kpi-stack{display:flex;flex-direction:column;gap:14px;min-width:0}
+@media (min-width:1000px){.top-grid{grid-template-columns:1.05fr 1fr;align-items:center}}
+.kpis{display:flex;flex-direction:column;gap:8px}
+.kpi-h{font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.kpi-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--shadow);padding:12px 12px 11px;min-width:0}
+.kpi .v{font-family:var(--f-display);font-weight:800;font-size:clamp(19px,5.6vw,34px);line-height:1;letter-spacing:-.3px;white-space:nowrap}
+.kpi .l{font-size:12.5px;font-weight:800;margin-top:6px;line-height:1.2}
+.kpi .s{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.25}
+@media (min-width:760px){.kpi{padding:16px 18px}.kpi .l{font-size:14px}.kpi .s{font-size:12px}}
 .pair{display:grid;gap:16px;grid-template-columns:1fr}
 @media (min-width:760px){.pair{grid-template-columns:1fr 1fr;align-items:stretch}}
 .hero .cap{position:absolute;left:16px;right:16px;bottom:14px;z-index:1;color:#fff;display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
@@ -363,28 +374,26 @@ function vOverview(){
   if(M.toRaise) alerts.push({c:'var(--gold)',t:`<b>AED ${fmt(M.toRaise)}</b> still to raise to cover the budget`,s:`Receipts so far cover ${pctTxt(pct(M.receipts,M.budget))} of AED ${fmt(M.budget)}`,go:'#budget'});
   const paidBooks = M.counts['Received']+M.counts['Partially Received'];
   return `
+  <div class="top-grid">
   <div class="hero"><img src="${POSTER}" alt="Nattarangu: an Amrutham Family dance and musical extravaganza, celebrating the 41st anniversary, powered by Bhima"></div>
-  <section class="pair">
-      <div class="card cash">
-        <div class="eyebrow">Cash in hand</div>
-        <div class="big num" style="margin-top:6px"><span class="aed">AED</span>${fmt(M.cash)}</div>
-        <div class="row">
-          <div class="flow in"><div class="l">${SVG.up} Collected</div><div class="v num">${fmt(M.collections)}</div></div>
-          <div class="flow out"><div class="l">${SVG.down} Paid out</div><div class="v num">${fmt(M.paid)}</div></div>
-        </div>
-        <div class="split" aria-hidden="true"><i style="width:${(inShare*100).toFixed(1)}%"></i></div>
-      </div>
-      <div class="card">
-        <div class="meter">
-          <div class="ring">${ring}<div class="c"><div><b class="num">${pctTxt(fund)}</b><span>funded</span></div></div></div>
-          <dl>
-            <div><dt><span class="legend-dot" style="background:var(--gold)"></span>Receipts vs budget</dt><dd class="num">${fmt(M.receipts)} <span class="muted" style="font-weight:600">/ ${fmt(M.budget)}</span></dd></div>
-            <div><dt><span class="legend-dot" style="background:var(--bad)"></span>Spent vs budget</dt><dd class="num">${fmt(M.cost)} <span class="muted" style="font-weight:600">· ${pctTxt(spent)}</span></dd></div>
-            <div><dt>Still to raise</dt><dd class="num" style="color:var(--gold-ink)">AED ${fmt(M.toRaise)}</dd></div>
-          </dl>
-        </div>
-      </div>
+  <div class="kpi-stack">
+  <section class="kpis" aria-label="Target">
+    <div class="kpi-h">Target</div>
+    <div class="kpi-row">
+      <div class="kpi"><div class="v num">${fmt(M.budget)}</div><div class="l">Budget</div><div class="s">approved</div></div>
+      <div class="kpi"><div class="v num" style="color:var(--gold-ink)">${fmt(M.toRaise)}</div><div class="l">Still to raise</div><div class="s">${pctTxt(pct(M.toRaise,M.budget))} of budget</div></div>
+      <div class="kpi"><div class="v num" style="color:var(--warn)">${fmt(M.spPending)}</div><div class="l">Still to collect</div><div class="s">promised</div></div>
+    </div>
   </section>
+  <section class="kpis" aria-label="Money">
+    <div class="kpi-h">Money</div>
+    <div class="kpi-row">
+      <div class="kpi"><div class="v num" style="color:var(--indigo)">${fmt(M.collections)}</div><div class="l">Collected</div><div class="s">sponsors + coupons</div></div>
+      <div class="kpi"><div class="v num" style="color:var(--bad)">${fmt(M.paid)}</div><div class="l">Paid out</div><div class="s">${pctTxt(pct(M.paid,M.budget))} of budget</div></div>
+      <div class="kpi"><div class="v num" style="color:var(--good)">${fmt(M.cash)}</div><div class="l">Cash in hand</div><div class="s">collected − paid</div></div>
+    </div>
+  </section>
+  </div></div>
 
   <div class="sec-head"><h2 class="sec">At a glance</h2><span class="meta">Tap to see details</span></div>
   <section class="tiles">
