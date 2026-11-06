@@ -578,6 +578,24 @@ function vSponsors(){
         <div class="share"><i style="width:${(pct(a,tot)*100).toFixed(1)}%"></i></div></div>
       <div style="text-align:right"><div class="amt num">${fmt(a)}</div>${s.pending?`<span class="pill s-pending">${fmt(s.pending)} pending</span>`:`<span class="pill s-received">Collected</span>`}</div>
     </div>`;}).join('')}
+  </div>
+  ${byMember(list)}`;
+}
+function byMember(list){
+  const mm=new Map();
+  list.forEach(s=>{ const k=(s.resp||'Not assigned').trim(); const m=mm.get(k)||{name:k,n:0,col:0,pen:0}; m.n++; m.col+=s.collected; m.pen+=s.pending; mm.set(k,m); });
+  const rows=[...mm.values()].sort((a,b)=>(b.col+b.pen)-(a.col+a.pen)||a.name.localeCompare(b.name));
+  if(!rows.length) return '';
+  const top=rows[0].col+rows[0].pen||1;
+  return `<div class="sec-head"><h2 class="sec">By member</h2><span class="meta">who brought the sponsors</span></div>
+  <div class="card">
+    ${rows.map(m=>`<div class="sp-row">
+      <span class="avatar">${esc(initials(m.name))}</span>
+      <div class="mid"><div class="nm">${esc(m.name)}</div>
+        <div class="sb">${m.n} sponsor${m.n===1?'':'s'}${m.pen?` · ${fmt(m.col)} collected · ${fmt(m.pen)} promised`:''}</div>
+        <div class="share"><i style="width:${(pct(m.col+m.pen,top)*100).toFixed(1)}%;background:var(--indigo)"></i></div></div>
+      <div style="text-align:right"><div class="amt num">${fmt(m.col+m.pen)}</div></div>
+    </div>`).join('')}
   </div>`;
 }
 
