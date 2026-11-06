@@ -574,7 +574,7 @@ function vSponsors(){
     ${list.map(s=>{const a=s.collected+s.pending;return `<div class="sp-row">
       <span class="avatar" style="background:var(--gold-soft);color:var(--gold-ink)">${esc(initials(s.name))}</span>
       <div class="mid"><div class="nm">${esc(s.name)}</div>
-        <div class="sb">${dShort(s.date)}${s.resp?' · Via '+esc(s.resp):''}${s.by?' · Received by '+esc(s.by):''}</div>
+        <div class="sb">${dShort(s.date)}${s.resp?' · Via '+esc(s.resp):''}${s.by?' · Received by '+esc(s.by):''}${s.collected&&!/soo?raj|suraj/i.test(s.by||'')?` <span class="pill s-pending">Not yet with Sooraj</span>`:''}</div>
         <div class="share"><i style="width:${(pct(a,tot)*100).toFixed(1)}%"></i></div></div>
       <div style="text-align:right"><div class="amt num">${fmt(a)}</div>${s.pending?`<span class="pill s-pending">${fmt(s.pending)} pending</span>`:`<span class="pill s-received">Collected</span>`}</div>
     </div>`;}).join('')}
