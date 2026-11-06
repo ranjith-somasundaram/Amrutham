@@ -254,6 +254,8 @@ h2.sec{font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1
 
 /* Sponsors */
 .sp-total .big{font-size:46px}
+.sp-split{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:12px;font-size:14px;color:var(--muted)}
+.sp-split b{color:var(--ink);font-weight:800;margin-left:4px}
 .sp-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
 .sp-row:last-child{border-bottom:0}
 .sp-row .mid{flex:1;min-width:0}
@@ -566,11 +568,14 @@ function vSponsors(){
   const tot = M.spCollected+M.spPending;
   const list = [...DATA.sponsors].sort((a,b)=>(b.collected+b.pending)-(a.collected+a.pending));
   return `
-  <div class="sec-head"><h2 class="sec">Sponsors</h2><span class="meta">${list.length} received</span></div>
+  <div class="sec-head"><h2 class="sec">Sponsors</h2><span class="meta">${list.length} sponsor${list.length===1?'':'s'}</span></div>
   <div class="card sp-total">
-    <div class="eyebrow">Sponsorship collected</div>
-    <div class="big num" style="margin-top:6px"><span class="aed">AED</span>${fmt(M.spCollected)}</div>
-    ${M.spPending?`<p class="note">Plus AED ${fmt(M.spPending)} promised, not yet collected.</p>`:`<p class="note">Only sponsorships already collected are shown.</p>`}
+    <div class="eyebrow">Total sponsorship</div>
+    <div class="big num" style="margin-top:6px"><span class="aed">AED</span>${fmt(M.spCollected+M.spPending)}</div>
+    <div class="sp-split">
+      <div><span class="legend-dot" style="background:var(--good)"></span>Collected <b class="num">${fmt(M.spCollected)}</b></div>
+      <div><span class="legend-dot" style="background:var(--warn)"></span>Promised <b class="num">${fmt(M.spPending)}</b></div>
+    </div>
   </div>
   <div class="card">
     ${list.map(s=>{const a=s.collected+s.pending;return `<div class="sp-row">
@@ -578,7 +583,7 @@ function vSponsors(){
       <div class="mid"><div class="nm">${esc(s.name)}</div>
         <div class="sb">${dShort(s.date)}${s.resp?' · Via '+esc(s.resp):''}${s.by?' · Received by '+esc(s.by):''}${s.collected&&!/soo?raj|suraj/i.test(s.by||'')?` <span class="pill s-pending">Not yet with Sooraj</span>`:''}</div>
         <div class="share"><i style="width:${(pct(a,tot)*100).toFixed(1)}%"></i></div></div>
-      <div style="text-align:right"><div class="amt num">${fmt(a)}</div>${s.pending?`<span class="pill s-pending">${fmt(s.pending)} pending</span>`:`<span class="pill s-received">Collected</span>`}</div>
+      <div style="text-align:right"><div class="amt num">${fmt(a)}</div>${s.pending?`<span class="pill s-pending">${fmt(s.pending)} pending</span>`:(s.collected?`<span class="pill s-received">Collected</span>`:`<span class="pill s-notgiven">No amount yet</span>`)}</div>
     </div>`;}).join('')}
   </div>
   ${byMember(list)}`;
