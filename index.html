@@ -348,7 +348,9 @@ function model(){
   const budget = D.budget.reduce((s,x)=>s+x.budget,0);
   const collections = D.deposits + spCollected + cpCollected + D.others;
   const receipts = spCollected + spPending + cpCollected + D.others;
-  const cash = collections - paid;
+  // Cash in hand counts only sponsorship money handed to Sooraj (finance head); coupon money counted as recorded
+  const spWithSooraj = D.sponsors.filter(s=>/soo?raj|suraj/i.test(s.by||'')).reduce((s,x)=>s+x.collected,0);
+  const cash = D.deposits + spWithSooraj + cpCollected + D.others - paid;
   const pendingBooks = counts['Not Received'];
   const pendingValue = pendingBooks*price;
   // members
@@ -422,7 +424,7 @@ function vOverview(){
     <div class="kpi-row">
       <div class="kpi"><div class="v num">${fmt(M.collections)}</div><div class="l">Collected</div><div class="s">sponsors + coupons</div></div>
       <div class="kpi"><div class="v num">${fmt(M.paid)}</div><div class="l">Paid out</div><div class="s">${pctTxt(pct(M.paid,M.budget))} of budget</div></div>
-      <div class="kpi"><div class="v num">${fmt(M.cash)}</div><div class="l">Cash in hand</div><div class="s">collected − paid</div></div>
+      <div class="kpi"><div class="v num">${fmt(M.cash)}</div><div class="l">Cash in hand</div><div class="s">with Sooraj, after payments</div></div>
     </div>
   </section>
   </div></div>
