@@ -118,6 +118,11 @@ h2.sec{font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1
 .kpi-h{font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .kpi-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-md);padding:13px 12px 12px;min-width:0}
+a.kpi{display:block;text-decoration:none;color:inherit;transition:border-color .2s,box-shadow .2s}
+a.kpi:hover{border-color:color-mix(in srgb,var(--indigo) 30%,var(--line));box-shadow:var(--shadow-hover)}
+.kpi-split{display:grid;grid-template-columns:1fr 2fr;gap:10px}
+.kpi-row.one{grid-template-columns:1fr}
+.kpi-row.two{grid-template-columns:repeat(2,minmax(0,1fr))}
 .kpi.act{border-color:color-mix(in srgb,var(--gold) 35%,var(--line))}
 .kpi .v{font-family:var(--f-display);font-weight:700;font-size:clamp(19px,5.6vw,34px);line-height:1;letter-spacing:-.3px;white-space:nowrap}
 .kpi .l{font-size:12.5px;font-weight:800;margin-top:6px;line-height:1.2}
@@ -417,41 +422,34 @@ function vOverview(){
     <div class="kpi-h">Target</div>
     <div class="kpi-row">
       <div class="kpi"><div class="v num">${fmt(M.budget)}</div><div class="l">Budget</div><div class="s">approved</div></div>
-      <div class="kpi act"><div class="v num" style="color:var(--gold-ink)">${fmt(M.toRaise)}</div><div class="l">Still to raise</div><div class="s">${pctTxt(pct(M.toRaise,M.budget))} of budget</div></div>
-      <div class="kpi${M.spPending?' act':''}"><div class="v num" style="color:${M.spPending?'var(--warn)':'var(--ink)'}">${fmt(M.spPending)}</div><div class="l">Still to collect</div><div class="s">promised</div></div>
+      <div class="kpi"><div class="v num">${fmt(M.receipts)}</div><div class="l">Raised so far</div><div class="s">sponsors + coupons</div></div>
+      <div class="kpi act"><div class="v num" style="color:var(--gold-ink)">${fmt(M.toRaise)}</div><div class="l">Still to raise</div><div class="s">budget − raised</div></div>
     </div>
   </section>
-  <section class="kpis" aria-label="Money">
-    <div class="kpi-h">Money</div>
+  <section class="kpis" aria-label="Sponsorship">
+    <div class="kpi-h">Sponsorship</div>
     <div class="kpi-row">
-      <div class="kpi"><div class="v num">${fmt(M.collections)}</div><div class="l">Collected</div><div class="s">sponsors + coupons</div></div>
-      <div class="kpi"><div class="v num">${fmt(M.paid)}</div><div class="l">Paid out</div><div class="s">${pctTxt(pct(M.paid,M.budget))} of budget</div></div>
-      <div class="kpi"><div class="v num">${fmt(M.cash)}</div><div class="l">Cash in hand</div><div class="s">with Sooraj, after payments</div></div>
+      <a class="kpi" href="#sponsors"><div class="v num">${fmt(M.spCollected+M.spPending)}</div><div class="l">Total</div><div class="s">${DATA.sponsors.length} sponsors</div></a>
+      <a class="kpi" href="#sponsors"><div class="v num">${fmt(M.spCollected)}</div><div class="l">Collected</div><div class="s">money received</div></a>
+      <a class="kpi${M.spPending?' act':''}" href="#sponsors"><div class="v num" style="color:${M.spPending?'var(--warn)':'var(--ink)'}">${fmt(M.spPending)}</div><div class="l">Promised</div><div class="s">not yet paid</div></a>
     </div>
   </section>
+  <div class="kpi-split">
+    <section class="kpis" aria-label="Coupons">
+      <div class="kpi-h">Coupons</div>
+      <div class="kpi-row one">
+        <a class="kpi" href="#coupons"><div class="v num">${fmt(M.cpCollected)}</div><div class="l">Collected</div><div class="s">${paidBooks} books paid</div></a>
+      </div>
+    </section>
+    <section class="kpis" aria-label="Money">
+      <div class="kpi-h">Money</div>
+      <div class="kpi-row two">
+        <a class="kpi" href="#budget"><div class="v num">${fmt(M.paid)}</div><div class="l">Paid out</div><div class="s">${pctTxt(pct(M.paid,M.budget))} of budget</div></a>
+        <div class="kpi"><div class="v num">${fmt(M.cash)}</div><div class="l">Cash in hand</div><div class="s">with Sooraj</div></div>
+      </div>
+    </section>
+  </div>
   </div></div>
-
-  <div class="sec-head"><h2 class="sec">At a glance</h2><span class="meta">Tap to see details</span></div>
-  <section class="tiles">
-    <a class="tile" href="#sponsors">
-      <div class="top-row"><span class="ico">${SVG.star}</span><span class="arrow">${SVG.arrow}</span></div>
-      <div class="v num">${fmt(M.spCollected)}</div><div class="l">Sponsorship</div><div class="s">${DATA.sponsors.length} sponsors · collected</div>
-    </a>
-    <a class="tile" href="#coupons">
-      <div class="top-row"><span class="ico">${SVG.ticket}</span><span class="arrow">${SVG.arrow}</span></div>
-      <div class="v num">${fmt(M.cpCollected)}</div><div class="l">Coupon money in</div><div class="s">${paidBooks} of ${M.totalBooks} books paid</div>
-      <div class="mini"><i style="width:${(pct(paidBooks,M.totalBooks)*100).toFixed(1)}%;background:var(--indigo)"></i></div>
-    </a>
-    <a class="tile" href="#coupons">
-      <div class="top-row"><span class="ico">${SVG.clock}</span><span class="arrow">${SVG.arrow}</span></div>
-      <div class="v num">${fmt(M.pendingValue)}</div><div class="l">Coupon money pending</div><div class="s">${M.pendingBooks} books with members</div>
-    </a>
-    <a class="tile" href="#budget">
-      <div class="top-row"><span class="ico">${SVG.wallet}</span><span class="arrow">${SVG.arrow}</span></div>
-      <div class="v num">${fmt(M.cost)}</div><div class="l">Expenses</div><div class="s">${pctTxt(pct(M.cost,M.budget))} of AED ${fmt(M.budget)} budget</div>
-      <div class="mini"><i style="width:${(spent*100).toFixed(1)}%;background:var(--indigo)"></i></div>
-    </a>
-  </section>
 
   <section class="grid2">
     <div class="card">
