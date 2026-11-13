@@ -350,10 +350,13 @@ const STATUS = {
 };
 
 /* ---------- model ---------- */
+const withSooraj = s => /soo?raj|suraj/i.test(s.by||'');
+function spSplit(s){ const w=withSooraj(s); return {col: w? s.collected : 0, pen: s.pending + (w? 0 : s.collected), held: !w && s.collected>0}; }
 function model(){
   const D = DATA, price = D.bookPrice;
-  const spCollected = D.sponsors.reduce((s,x)=>s+x.collected,0);
-  const spPending = D.sponsors.reduce((s,x)=>s+x.pending,0);
+  // Sponsorship counts as Collected only once Sooraj (finance head) has received it; anything else is Pending
+  const spCollected = D.sponsors.reduce((s,x)=>s+spSplit(x).col,0);
+  const spPending = D.sponsors.reduce((s,x)=>s+spSplit(x).pen,0);
   const cpCollected = D.coupons.reduce((s,x)=>s+x.recv,0);
   const cpVariance = D.coupons.reduce((s,x)=>s+(x.sales-x.recv),0);
   const by = st => D.coupons.filter(c=>c.status===st);
@@ -365,8 +368,7 @@ function model(){
   const collections = D.deposits + spCollected + cpCollected + D.others;
   const receipts = spCollected + spPending + cpCollected + D.others;
   // Cash in hand counts only sponsorship money handed to Sooraj (finance head); coupon money counted as recorded
-  const spWithSooraj = D.sponsors.filter(s=>/soo?raj|suraj/i.test(s.by||'')).reduce((s,x)=>s+x.collected,0);
-  const cash = D.deposits + spWithSooraj + cpCollected + D.others - paid;
+  const cash = D.deposits + spCollected + cpCollected + D.others - paid;
   const pendingBooks = counts['Not Received'];
   const pendingValue = pendingBooks*price;
   // members
@@ -387,7 +389,7 @@ function model(){
     const actual = pays.reduce((s,p)=>s+p.paid+p.due,0);
     return {...b,actual,pays};
   });
-  return {spWithSooraj,price,spCollected,spPending,cpCollected,cpVariance,counts,totalBooks,paid,due,cost,budget,collections,receipts,cash,pendingBooks,pendingValue,members,lines,profit:receipts-cost,toRaise:Math.max(0,budget-receipts)};
+  return {price,spCollected,spPending,cpCollected,cpVariance,counts,totalBooks,paid,due,cost,budget,collections,receipts,cash,pendingBooks,pendingValue,members,lines,profit:receipts-cost,toRaise:Math.max(0,budget-receipts)};
 }
 
 
@@ -464,17 +466,14 @@ function vOverview(){
   </div></div>`;
 }
 function cashTable(){
-  const away = M.spCollected - M.spWithSooraj;
-  const held = M.spWithSooraj + M.cpCollected + (DATA.deposits||0) + (DATA.others||0);
   return `<div class="card cash-tbl">
     <div class="eyebrow" style="margin-bottom:10px">How cash in hand is worked out</div>
     <div class="pl num">
       <span class="k">Sponsorship collected</span><span class="v">${fmt(M.spCollected)}</span>
-      ${away?`<span class="k">Less: not yet with Sooraj</span><span class="v" style="color:var(--warn)">(${fmt(away)})</span>`:''}
       <span class="k">Coupons collected</span><span class="v">${fmt(M.cpCollected)}</span>
       ${DATA.deposits?`<span class="k">Refundable deposits</span><span class="v">${fmt(DATA.deposits)}</span>`:''}
       ${DATA.others?`<span class="k">Others</span><span class="v">${fmt(DATA.others)}</span>`:''}
-      <span class="k tot">Total with Sooraj</span><span class="v tot" style="color:var(--ink)">${fmt(held)}</span>
+      <span class="k tot">Total collected</span><span class="v tot" style="color:var(--ink)">${fmt(M.collections)}</span>
       <span class="k">Less: paid out</span><span class="v" style="color:var(--bad)">(${fmt(M.paid)})</span>
       <span class="k tot">Cash in hand</span><span class="v tot" style="color:var(--good)">${fmt(M.cash)}</span>
     </div>
@@ -587,19 +586,19 @@ function vSponsors(){
     </div>
   </div>
   <div class="card">
-    ${list.map(s=>{const a=s.collected+s.pending;return `<div class="sp-row">
+    ${list.map(s=>{const a=s.collected+s.pending, sp=spSplit(s);return `<div class="sp-row">
       <span class="avatar" style="background:var(--gold-soft);color:var(--gold-ink)">${esc(initials(s.name))}</span>
       <div class="mid"><div class="nm">${esc(s.name)}</div>
-        <div class="sb">${dShort(s.date)}${s.resp?' · Via '+esc(s.resp):''}${s.by?' · Received by '+esc(s.by):''}${s.collected&&!/soo?raj|suraj/i.test(s.by||'')?` <span class="pill s-pending">Not yet with Sooraj</span>`:''}</div>
+        <div class="sb">${dShort(s.date)}${s.resp?' · Via '+esc(s.resp):''}${s.by?' · Received by '+esc(s.by):''}${sp.held?` <span class="pill s-pending">With ${esc(s.resp||'member')}, not yet with Sooraj</span>`:''}</div>
         <div class="share"><i style="width:${(pct(a,tot)*100).toFixed(1)}%"></i></div></div>
-      <div style="text-align:right"><div class="amt num">${fmt(a)}</div>${s.pending?`<span class="pill s-pending">${fmt(s.pending)} pending</span>`:(s.collected?`<span class="pill s-received">Collected</span>`:`<span class="pill s-notgiven">No amount yet</span>`)}</div>
+      <div style="text-align:right"><div class="amt num">${fmt(a)}</div>${sp.pen?`<span class="pill s-pending">${fmt(sp.pen)} pending</span>`:(sp.col?`<span class="pill s-received">Collected</span>`:`<span class="pill s-notgiven">No amount yet</span>`)}</div>
     </div>`;}).join('')}
   </div>
   ${byMember(list)}`;
 }
 function byMember(list){
   const mm=new Map();
-  list.forEach(s=>{ const k=(s.resp||'Not assigned').trim(); const m=mm.get(k)||{name:k,n:0,col:0,pen:0}; m.n++; m.col+=s.collected; m.pen+=s.pending; mm.set(k,m); });
+  list.forEach(s=>{ const k=(s.resp||'Not assigned').trim(); const m=mm.get(k)||{name:k,n:0,col:0,pen:0}; m.n++; const sp=spSplit(s); m.col+=sp.col; m.pen+=sp.pen; mm.set(k,m); });
   const rows=[...mm.values()].sort((a,b)=>(b.col+b.pen)-(a.col+a.pen)||a.name.localeCompare(b.name));
   if(!rows.length) return '';
   const top=rows[0].col+rows[0].pen||1;
