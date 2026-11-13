@@ -260,6 +260,10 @@ a.kpi:hover{border-color:color-mix(in srgb,var(--indigo) 30%,var(--line));box-sh
 .blist>button{all:unset;cursor:pointer;display:block;padding:14px 4px;border-bottom:1px solid var(--line)}
 .blist>button:focus-visible{outline:2px solid var(--indigo);outline-offset:2px;border-radius:8px}
 .blist>button:last-child{border-bottom:0}
+.pay-sec{display:flex;flex-direction:column;gap:6px}
+.pay-sec+.pay-sec{margin-top:12px}
+.pay-h{display:flex;justify-content:space-between;gap:10px;align-items:baseline;padding:2px 2px 0;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.pay-h b{font-size:14px;color:var(--ink);letter-spacing:0}
 .pays{display:flex;flex-direction:column;gap:6px;margin-top:10px}
 .pay{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:8px 10px;border-radius:10px;background:var(--panel-2)}
 .pay .w{min-width:0}
@@ -537,6 +541,15 @@ function memberList(){
 }
 
 let openLine = null;
+function paySections(){
+  const g=new Map();
+  DATA.payments.forEach(p=>{ const k=p.type||'Other'; if(!g.has(k)) g.set(k,[]); g.get(k).push(p); });
+  const secs=[...g.entries()].map(([k,ps])=>({k,ps:ps.sort((a,b)=>(b.date||'').localeCompare(a.date||'')),sum:ps.reduce((s,p)=>s+p.paid+p.due,0)})).sort((a,b)=>b.sum-a.sum||a.k.localeCompare(b.k));
+  return secs.map(s=>`<div class="pay-sec">
+    <div class="pay-h"><span>${esc(s.k)}</span><b class="num">${fmt(s.sum)}</b></div>
+    ${s.ps.map(p=>`<div class="pay"><span class="w"><b>${esc(p.item)}</b><span>${dShort(p.date)} · ${p.due?'<span style="color:var(--warn);font-weight:700">Not paid</span>':'Paid by '+esc(p.by||'—')}</span></span><b class="num">${fmt(p.paid+p.due)}</b></div>`).join('')}
+  </div>`).join('');
+}
 function vBudget(){
   const remain = M.budget-M.cost;
   return `
@@ -559,7 +572,7 @@ function vBudget(){
     </div>
     <div class="card">
       <div class="eyebrow" style="margin-bottom:10px">Payments so far</div>
-      <div class="pays" style="margin-top:0">${DATA.payments.length?[...DATA.payments].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(p=>`<div class="pay"><span class="w"><b>${esc(p.item)}</b><span>${dShort(p.date)} · ${esc(p.type)} · ${p.due?'<span style="color:var(--warn);font-weight:700">Not paid</span>':'Paid by '+esc(p.by||'—')}</span></span><b class="num">${fmt(p.paid+p.due)}</b></div>`).join(''):'<div class="empty">No payments entered yet.</div>'}</div>
+      <div class="pays" style="margin-top:0">${DATA.payments.length?paySections():'<div class="empty">No payments entered yet.</div>'}</div>
       <div class="pl num" style="margin-top:14px">
         <span class="k">Paid</span><span class="v">${fmt(M.paid)}</span>
         <span class="k">Not yet paid</span><span class="v" style="color:var(--warn)">${fmt(M.due)}</span>
