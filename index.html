@@ -113,13 +113,22 @@ h2.sec{font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1
 .countdown .cd-bar i{display:block;height:100%;background:var(--gold);border-radius:999px}
 .countdown.today .cd-n{font-size:28px}
 .kpi-stack{display:flex;flex-direction:column;gap:14px;min-width:0}
-@media (min-width:1000px){.top-grid{grid-template-columns:1.05fr 1fr;align-items:center}}
+@media (min-width:1000px){.top-grid{grid-template-columns:1.05fr 1fr;align-items:start}.hero-col{position:sticky;top:calc(env(safe-area-inset-top,0px) + 84px)}}
 .kpis{display:flex;flex-direction:column;gap:8px}
 .kpi-h{font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .kpi-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-md);padding:13px 12px 12px;min-width:0}
 a.kpi{display:block;text-decoration:none;color:inherit;transition:border-color .2s,box-shadow .2s}
 a.kpi:hover{border-color:color-mix(in srgb,var(--indigo) 30%,var(--line));box-shadow:var(--shadow-hover)}
+.kpi.wide{display:flex;align-items:center;gap:14px}
+.kpi.wide .l{margin-top:0}
+.cash-tbl{margin-top:4px;padding:16px 18px}
+.cash-tbl .pl{font-size:14px;row-gap:7px}
+.cash-tbl .pl .tot{padding-top:8px}
+.sp-three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:10px}
+.sp-three > div{min-width:0}
+.sp-three .n{font-family:var(--f-display);font-weight:700;font-size:clamp(26px,8vw,44px);line-height:1;letter-spacing:-.4px;white-space:nowrap}
+.sp-three .l{font-size:13px;font-weight:800;margin-top:6px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .kpi-split{display:grid;grid-template-columns:1fr 2fr;gap:10px}
 .kpi-row.one{grid-template-columns:1fr}
 .kpi-row.two{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -378,7 +387,7 @@ function model(){
     const actual = pays.reduce((s,p)=>s+p.paid+p.due,0);
     return {...b,actual,pays};
   });
-  return {price,spCollected,spPending,cpCollected,cpVariance,counts,totalBooks,paid,due,cost,budget,collections,receipts,cash,pendingBooks,pendingValue,members,lines,profit:receipts-cost,toRaise:Math.max(0,budget-receipts)};
+  return {spWithSooraj,price,spCollected,spPending,cpCollected,cpVariance,counts,totalBooks,paid,due,cost,budget,collections,receipts,cash,pendingBooks,pendingValue,members,lines,profit:receipts-cost,toRaise:Math.max(0,budget-receipts)};
 }
 
 
@@ -431,43 +440,45 @@ function vOverview(){
     <div class="kpi-row">
       <a class="kpi" href="#sponsors"><div class="v num">${fmt(M.spCollected+M.spPending)}</div><div class="l">Total</div><div class="s">${DATA.sponsors.length} sponsors</div></a>
       <a class="kpi" href="#sponsors"><div class="v num">${fmt(M.spCollected)}</div><div class="l">Collected</div><div class="s">money received</div></a>
-      <a class="kpi${M.spPending?' act':''}" href="#sponsors"><div class="v num" style="color:${M.spPending?'var(--warn)':'var(--ink)'}">${fmt(M.spPending)}</div><div class="l">Promised</div><div class="s">not yet paid</div></a>
+      <a class="kpi${M.spPending?' act':''}" href="#sponsors"><div class="v num" style="color:${M.spPending?'var(--warn)':'var(--ink)'}">${fmt(M.spPending)}</div><div class="l">Pending</div><div class="s">not yet paid</div></a>
     </div>
   </section>
-  <div class="kpi-split">
-    <section class="kpis" aria-label="Coupons">
-      <div class="kpi-h">Coupons</div>
-      <div class="kpi-row one">
-        <a class="kpi" href="#coupons"><div class="v num">${fmt(M.cpCollected)}</div><div class="l">Collected</div><div class="s">${paidBooks} books paid</div></a>
-      </div>
-    </section>
-    <section class="kpis" aria-label="Money">
-      <div class="kpi-h">Money</div>
-      <div class="kpi-row two">
-        <a class="kpi" href="#budget"><div class="v num">${fmt(M.paid)}</div><div class="l">Paid out</div><div class="s">${pctTxt(pct(M.paid,M.budget))} of budget</div></a>
-        <div class="kpi"><div class="v num">${fmt(M.cash)}</div><div class="l">Cash in hand</div><div class="s">with Sooraj</div></div>
-      </div>
-    </section>
-  </div>
-  </div></div>
-
-  <section class="grid2">
-    <div class="card">
-      <div class="eyebrow" style="margin-bottom:12px">Needs attention</div>
-      <ul class="alerts">${alerts.map(a=>`<li><span class="dot" style="background:${a.c}"></span><div><div class="t">${a.t}</div><div class="s">${a.s}</div></div></li>`).join('')}</ul>
+  <section class="kpis" aria-label="Coupons">
+    <div class="kpi-h">Coupons</div>
+    <div class="kpi-row two">
+      <a class="kpi" href="#coupons"><div class="v num">${fmt(M.cpCollected)}</div><div class="l">Collected</div><div class="s">${paidBooks} books paid</div></a>
+      <a class="kpi${M.pendingBooks?' act':''}" href="#coupons"><div class="v num" style="color:${M.pendingBooks?'var(--warn)':'var(--ink)'}">${fmt(M.pendingValue)}</div><div class="l">Pending</div><div class="s">${M.pendingBooks} books with members</div></a>
     </div>
-    <div class="card">
-      <div class="eyebrow" style="margin-bottom:12px">Event result so far</div>
-      <div class="pl num">
-        <span class="k">Sponsorship</span><span class="v">${fmt(M.spCollected+M.spPending)}</span>
-        <span class="k">Coupon sales</span><span class="v">${fmt(M.cpCollected)}</span>
-        ${DATA.others?`<span class="k">Others</span><span class="v">${fmt(DATA.others)}</span>`:''}
-        <span class="k">Less expenses</span><span class="v" style="color:var(--bad)">(${fmt(M.cost)})</span>
-        <span class="k tot">Surplus</span><span class="v tot" style="color:${M.profit>=0?'var(--good)':'var(--bad)'}">${M.profit<0?'(':''}${fmt(Math.abs(M.profit))}${M.profit<0?')':''}</span>
-      </div>
-      <p class="note">Counts only money received and expenses entered so far. Most of the AED ${fmt(M.budget)} budget is still to be spent.</p>
+    <div class="kpi-row one">
+      <a class="kpi wide" href="#coupons"><div class="v num">${fmt(M.counts['Not Given']*M.price)}</div><div><div class="l">Not issued</div><div class="s">${M.counts['Not Given']} books not handed out</div></div></a>
     </div>
-  </section>`;
+  </section>
+  <section class="kpis" aria-label="Money">
+    <div class="kpi-h">Money</div>
+    <div class="kpi-row two">
+      <a class="kpi" href="#budget"><div class="v num">${fmt(M.paid)}</div><div class="l">Paid out</div><div class="s">${pctTxt(pct(M.paid,M.budget))} of budget</div></a>
+      <div class="kpi"><div class="v num" style="color:var(--good)">${fmt(M.cash)}</div><div class="l">Cash in hand</div><div class="s">with Sooraj</div></div>
+    </div>
+    ${cashTable()}
+  </section>
+  </div></div>`;
+}
+function cashTable(){
+  const away = M.spCollected - M.spWithSooraj;
+  const held = M.spWithSooraj + M.cpCollected + (DATA.deposits||0) + (DATA.others||0);
+  return `<div class="card cash-tbl">
+    <div class="eyebrow" style="margin-bottom:10px">How cash in hand is worked out</div>
+    <div class="pl num">
+      <span class="k">Sponsorship collected</span><span class="v">${fmt(M.spCollected)}</span>
+      ${away?`<span class="k">Less: not yet with Sooraj</span><span class="v" style="color:var(--warn)">(${fmt(away)})</span>`:''}
+      <span class="k">Coupons collected</span><span class="v">${fmt(M.cpCollected)}</span>
+      ${DATA.deposits?`<span class="k">Refundable deposits</span><span class="v">${fmt(DATA.deposits)}</span>`:''}
+      ${DATA.others?`<span class="k">Others</span><span class="v">${fmt(DATA.others)}</span>`:''}
+      <span class="k tot">Total with Sooraj</span><span class="v tot" style="color:var(--ink)">${fmt(held)}</span>
+      <span class="k">Less: paid out</span><span class="v" style="color:var(--bad)">(${fmt(M.paid)})</span>
+      <span class="k tot">Cash in hand</span><span class="v tot" style="color:var(--good)">${fmt(M.cash)}</span>
+    </div>
+  </div>`;
 }
 
 let cpFilter = 'pending', cpQuery = '', openMember = null;
@@ -568,11 +579,11 @@ function vSponsors(){
   return `
   <div class="sec-head"><h2 class="sec">Sponsors</h2><span class="meta">${list.length} sponsor${list.length===1?'':'s'}</span></div>
   <div class="card sp-total">
-    <div class="eyebrow">Total sponsorship</div>
-    <div class="big num" style="margin-top:6px"><span class="aed">AED</span>${fmt(M.spCollected+M.spPending)}</div>
-    <div class="sp-split">
-      <div><span class="legend-dot" style="background:var(--good)"></span>Collected <b class="num">${fmt(M.spCollected)}</b></div>
-      <div><span class="legend-dot" style="background:var(--warn)"></span>Promised <b class="num">${fmt(M.spPending)}</b></div>
+    <div class="eyebrow">Sponsorship · AED</div>
+    <div class="sp-three">
+      <div><div class="n num">${fmt(M.spCollected+M.spPending)}</div><div class="l">Total</div></div>
+      <div><div class="n num" style="color:var(--good)">${fmt(M.spCollected)}</div><div class="l">Collected</div></div>
+      <div><div class="n num" style="color:${M.spPending?'var(--warn)':'var(--ink)'}">${fmt(M.spPending)}</div><div class="l">Pending</div></div>
     </div>
   </div>
   <div class="card">
@@ -597,7 +608,7 @@ function byMember(list){
     ${rows.map(m=>`<div class="sp-row">
       <span class="avatar">${esc(initials(m.name))}</span>
       <div class="mid"><div class="nm">${esc(m.name)}</div>
-        <div class="sb">${m.n} sponsor${m.n===1?'':'s'}${m.pen?` · ${fmt(m.col)} collected · ${fmt(m.pen)} promised`:''}</div>
+        <div class="sb">${m.n} sponsor${m.n===1?'':'s'}${m.pen?` · ${fmt(m.col)} collected · ${fmt(m.pen)} pending`:''}</div>
         <div class="share"><i style="width:${(pct(m.col+m.pen,top)*100).toFixed(1)}%;background:var(--indigo)"></i></div></div>
       <div style="text-align:right"><div class="amt num">${fmt(m.col+m.pen)}</div></div>
     </div>`).join('')}
