@@ -451,9 +451,6 @@ function vOverview(){
       <a class="kpi" href="#coupons"><div class="v num">${fmt(M.cpCollected)}</div><div class="l">Collected</div><div class="s">${paidBooks} books paid</div></a>
       <a class="kpi${M.pendingBooks?' act':''}" href="#coupons"><div class="v num" style="color:${M.pendingBooks?'var(--warn)':'var(--ink)'}">${fmt(M.pendingValue)}</div><div class="l">Pending</div><div class="s">${M.pendingBooks} books with members</div></a>
     </div>
-    <div class="kpi-row one">
-      <a class="kpi wide" href="#coupons"><div class="v num">${fmt(M.counts['Not Given']*M.price)}</div><div><div class="l">Not issued</div><div class="s">${M.counts['Not Given']} books not handed out</div></div></a>
-    </div>
   </section>
   <section class="kpis" aria-label="Money">
     <div class="kpi-h">Money</div>
